@@ -73,7 +73,7 @@ body::before{
 .theme-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
 /* Header */
-header{text-align:center;margin-bottom:48px;}
+header{text-align:center;margin-bottom:24px;}
 h1{
   font-family:'Playfair Display',serif;
   font-size:clamp(26px,5vw,44px);font-weight:600;
@@ -175,8 +175,29 @@ input[type="date"]:focus{border-color:var(--accent);}
 [data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.2);cursor:pointer;}
 :root:not([data-theme]) input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer;}
 
-/* Time field – auto highlight */
+/* Time field – Uhr-Symbol verstecken + auto highlight */
+input[type="time"]::-webkit-calendar-picker-indicator{display:none;}
 input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
+
+/* Icon-Buttons in Tabelle */
+.btn-icon{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:3px 5px;transition:color .2s;line-height:1;display:inline-flex;align-items:center;}
+.btn-icon.edit:hover{color:var(--accent);}
+.btn-icon.del:hover{color:#c0554a;}
+.btn-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Summary card checked / abgehakt */
+.summary-card.checked{opacity:0.55;}
+.summary-card.checked .sc-name,.summary-card.checked .sc-time,.summary-card.checked .sc-count{text-decoration:line-through;color:var(--text-muted)!important;}
+.sc-check{display:flex;align-items:center;gap:6px;margin-top:10px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-muted);user-select:none;}
+.sc-check input{accent-color:var(--accent);width:12px;height:12px;cursor:pointer;}
+.sc-check.done{color:var(--accent-lt);}
+
+/* Mandanten-Verwaltung */
+.mandant-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+.mandant-row:last-child{border-bottom:none;}
+.mandant-row .mr-name{flex:1;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+.mandant-row input[type="text"]{flex:1;font-size:11px;padding:4px 7px;}
+.mandant-row .btn-icon{flex-shrink:0;}
 
 /* Pill bar */
 .pill-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;}
@@ -200,8 +221,6 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
 .zt-table td.td-note{color:var(--text-muted);font-size:10px;letter-spacing:.5px;}
 .zt-table td.td-act{text-align:right;}
 .zt-table .empty-row td{text-align:center;padding:28px;color:var(--text-muted);font-size:11px;letter-spacing:1px;}
-.btn-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 6px;transition:color .2s;letter-spacing:1px;}
-.btn-del:hover{color:#c0554a;}
 
 /* Summary grid */
 .summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:16px;}
@@ -236,15 +255,51 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
   <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')" title="Dunkel">
     <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
   </button>
-  <button class="theme-btn" id="btn-system" onclick="setTheme('system')" title="System">
-    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-  </button>
   <button class="theme-btn" id="btn-light" onclick="setTheme('light')" title="Hell">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
   </button>
 </div>
 
-<!-- Reload Warning Modal -->
+<!-- Edit Entry Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">Buchung bearbeiten</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div>
+        <input type="time" id="editVon" step="300" onkeydown="timeKeydown(event,'editVon')">
+        <div class="hint">Von</div>
+      </div>
+      <div>
+        <input type="time" id="editBis" step="300" onkeydown="timeKeydown(event,'editBis')">
+        <div class="hint">Bis</div>
+      </div>
+      <div>
+        <input type="text" id="editMandant" placeholder="Mandant" list="mandantList">
+        <div class="hint">Mandant</div>
+      </div>
+      <div>
+        <input type="text" id="editNotiz" placeholder="Tätigkeit (optional)">
+        <div class="hint">Tätigkeit</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveEdit()">Speichern</button>
+      <button class="btn" onclick="closeEditModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mandanten-Verwaltung Modal -->
+<div class="modal-overlay" id="mandantModal">
+  <div class="modal">
+    <div class="modal-title">Mandanten verwalten</div>
+    <div id="mandantMgmtList" style="margin-bottom:20px;max-height:340px;overflow-y:auto;"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeMandantModal()">Schließen</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="reloadModal">
   <div class="modal">
     <div class="modal-title">⚠ Seite neu laden?</div>
@@ -264,7 +319,7 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
 
   <header>
     <h1>Zeit<span>erfassung</span></h1>
-    <p class="subtitle">Lokal &middot; Tagesbasiert &middot; XLSX &amp; PDF Export</p>
+    <p class="subtitle">Lokal &middot; Tagesbasiert &middot; XLSX Export &amp; Import</p>
   </header>
 
   <!-- Date Nav -->
@@ -272,7 +327,6 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
     <button class="btn" onclick="changeDay(-1)">&#9664;</button>
     <div class="date-nav-center" id="dateDisplay"></div>
     <input type="date" id="datePicker" onchange="onDatePick(this.value)">
-    <button class="btn" onclick="changeDay(1)">&#9654;</button>
     <button class="btn btn-primary" onclick="goToday()">Heute</button>
   </div>
 
@@ -304,6 +358,12 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
       <span class="count-badge" id="entryCount">0 Einträge</span>
     </div>
     <div class="pill-bar" id="pillBar"></div>
+    <div style="margin-top:10px;">
+      <button class="btn" style="font-size:10px;padding:5px 12px;" onclick="openMandantModal()">
+        <svg style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        Mandanten verwalten
+      </button>
+    </div>
   </div>
 
   <!-- Buchungstabelle -->
@@ -432,7 +492,7 @@ function roundTo5(val){
   return fromMin(rounded);
 }
 
-/* ── Pfeiltasten: 15-min-Schritte im Bis-Feld ──────────────── */
+/* ── Pfeiltasten: 15-min-Schritte ──────────────────────────── */
 function timeKeydown(e,fieldId){
   if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
   e.preventDefault();
@@ -445,7 +505,6 @@ function timeKeydown(e,fieldId){
   if(newMin<0)newMin=0;
   if(newMin>=24*60)newMin=23*60+55;
   el.value=fromMin(newMin);
-  // Wenn Bis-Feld per Pfeile verändert → manuell
   if(fieldId==='inputBis'){
     bisAuto=false;
     el.classList.remove('auto-val');
@@ -516,11 +575,6 @@ function clearDay(){
 }
 
 /* ── Mandant-Pills ──────────────────────────────────────────── */
-function allMandants(){
-  var s={};
-  Object.values(allData).forEach(function(day){day.forEach(function(e){s[e.mandant]=1;});});
-  return Object.keys(s).sort();
-}
 function selectMandant(name){
   document.getElementById('inputMandant').value=name;
   renderPills();
@@ -560,7 +614,10 @@ function render(){
       '<td class="td-dur">'+hhmm(dur)+' h</td>'+
       '<td>'+esc(e.mandant)+'</td>'+
       '<td class="td-note">'+esc(e.notiz)+'</td>'+
-      '<td class="td-act"><button class="btn-del" onclick="deleteEntry('+e.id+')">DEL</button></td>'+
+      '<td class="td-act">'+
+      '<button class="btn-icon edit" onclick="openEditModal('+e.id+')" title="Bearbeiten"><svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>'+
+      '<button class="btn-icon del" onclick="deleteEntry('+e.id+')" title="Löschen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
+      '</td>'+
       '</tr>';
   });
   tbody.innerHTML=rows;
@@ -585,13 +642,18 @@ function render(){
   });
   document.getElementById('totalRows').innerHTML=rr;
 
-  // Summary-Cards
+  // Summary-Cards mit DATEV-Checkbox
   var sc='';
   sorted.forEach(function(name){
-    sc+='<div class="summary-card">'+
+    var key='datev_'+currentDate+'_'+name;
+    var checked=localStorage.getItem(key)==='1';
+    sc+='<div class="summary-card'+(checked?' checked':'')+'" id="sc-'+esc(name)+'">'+ 
       '<div class="sc-name">'+esc(name)+'</div>'+
       '<div class="sc-time">'+hhmm(map[name].min)+'<span class="sc-unit"> h</span></div>'+
       '<div class="sc-count">'+map[name].count+' Buchung'+(map[name].count===1?'':'en')+'</div>'+
+      '<label class="sc-check'+(checked?' done':'')+'">'+
+        '<input type="checkbox" '+(checked?'checked':'')+' onchange="toggleDatev(\''+esc(name)+'\',this)"> In DATEV übernommen'+
+      '</label>'+
       '</div>';
   });
   document.getElementById('summaryGrid').innerHTML=sc;
@@ -688,7 +750,120 @@ function importXLSX(input){
   reader.readAsArrayBuffer(file);
 }
 
-/* ── Toast ──────────────────────────────────────────────────── */
+/* ── DATEV-Checkbox ─────────────────────────────────────────── */
+function toggleDatev(name,cb){
+  var key='datev_'+currentDate+'_'+name;
+  localStorage.setItem(key,cb.checked?'1':'0');
+  render();
+}
+
+/* ── Edit Entry Modal ───────────────────────────────────────── */
+var editingId=null;
+function openEditModal(id){
+  var entries=getEntries();
+  var e=entries.find(function(x){return x.id===id;});
+  if(!e)return;
+  editingId=id;
+  document.getElementById('editVon').value=e.von;
+  document.getElementById('editBis').value=e.bis;
+  document.getElementById('editMandant').value=e.mandant;
+  document.getElementById('editNotiz').value=e.notiz||'';
+  document.getElementById('editModal').classList.add('show');
+}
+function closeEditModal(){
+  document.getElementById('editModal').classList.remove('show');
+  editingId=null;
+}
+function saveEdit(){
+  if(editingId===null)return;
+  var von=roundTo5(document.getElementById('editVon').value);
+  var bis=roundTo5(document.getElementById('editBis').value);
+  var mandant=document.getElementById('editMandant').value.trim();
+  var notiz=document.getElementById('editNotiz').value.trim();
+  if(!von||!bis){toast('Bitte Von und Bis angeben.');return;}
+  if(toMin(bis)<=toMin(von)){toast('Bis muss nach Von liegen.');return;}
+  if(!mandant){toast('Bitte Mandanten angeben.');return;}
+  var entries=getEntries();
+  var idx=entries.findIndex(function(x){return x.id===editingId;});
+  if(idx>=0){entries[idx]={id:editingId,von:von,bis:bis,mandant:mandant,notiz:notiz};}
+  entries.sort(function(a,b){return a.von.localeCompare(b.von);});
+  setEntries(entries);
+  closeEditModal();
+  render();
+  toast('Buchung gespeichert.');
+}
+
+/* ── Mandanten-Verwaltung ───────────────────────────────────── */
+// Eigene Mandantenliste (ergänzend zu den aus Buchungen abgeleiteten)
+function getCustomMandants(){
+  try{return JSON.parse(localStorage.getItem('g_mandants')||'[]');}catch(e){return[];}
+}
+function saveCustomMandants(list){localStorage.setItem('g_mandants',JSON.stringify(list));}
+
+function allMandants(){
+  var s={};
+  Object.values(allData).forEach(function(day){day.forEach(function(e){s[e.mandant]=1;});});
+  getCustomMandants().forEach(function(m){s[m]=1;});
+  return Object.keys(s).sort();
+}
+
+function openMandantModal(){
+  renderMandantMgmt();
+  document.getElementById('mandantModal').classList.add('show');
+}
+function closeMandantModal(){
+  document.getElementById('mandantModal').classList.remove('show');
+  renderPills();
+}
+function renderMandantMgmt(){
+  var mandants=allMandants();
+  var html='';
+  if(!mandants.length){
+    html='<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:var(--text-muted);padding:12px 0;">Keine Mandanten vorhanden.</div>';
+  }
+  mandants.forEach(function(m,i){
+    html+='<div class="mandant-row" id="mr-'+i+'">'+
+      '<span class="mr-name">'+esc(m)+'</span>'+
+      '<button class="btn-icon edit" onclick="startEditMandant('+i+',\''+esc(m)+'\')" title="Umbenennen"><svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>'+
+      '<button class="btn-icon del" onclick="deleteMandant(\''+esc(m)+'\')" title="Löschen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
+      '</div>';
+  });
+  document.getElementById('mandantMgmtList').innerHTML=html;
+}
+function startEditMandant(i,oldName){
+  var row=document.getElementById('mr-'+i);
+  row.innerHTML=
+    '<input type="text" value="'+esc(oldName)+'" id="me-'+i+'" style="flex:1;font-size:11px;padding:4px 7px;">'+
+    '<button class="btn-icon edit" onclick="saveMandantEdit('+i+',\''+esc(oldName)+'\')" title="Speichern"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>'+
+    '<button class="btn-icon del" onclick="renderMandantMgmt()" title="Abbrechen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+  document.getElementById('me-'+i).focus();
+}
+function saveMandantEdit(i,oldName){
+  var newName=(document.getElementById('me-'+i).value||'').trim();
+  if(!newName){toast('Name darf nicht leer sein.');return;}
+  // In allen Buchungen umbenennen
+  Object.keys(allData).forEach(function(d){
+    allData[d].forEach(function(e){if(e.mandant===oldName)e.mandant=newName;});
+  });
+  saveData();
+  // Custom-Liste aktualisieren
+  var cl=getCustomMandants();
+  var ci=cl.indexOf(oldName);
+  if(ci>=0)cl[ci]=newName; else cl.push(newName);
+  saveCustomMandants(cl);
+  renderMandantMgmt();
+  toast('Umbenannt.');
+}
+function deleteMandant(name){
+  if(!confirm('"'+name+'" aus der Liste entfernen?\n(Buchungen bleiben erhalten)'))return;
+  var cl=getCustomMandants().filter(function(m){return m!==name;});
+  saveCustomMandants(cl);
+  // Aus allData-Buchungen NICHT löschen, nur Custom-Liste
+  renderMandantMgmt();
+  toast('Mandant entfernt.');
+}
+
+
 function toast(msg){
   var el=document.getElementById('toast');
   el.textContent=msg;el.classList.add('show');
@@ -696,9 +871,13 @@ function toast(msg){
 }
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
-/* ── Keyboard: Enter = buchen ───────────────────────────────── */
+/* ── Keyboard: Enter = buchen / speichern ───────────────────── */
 document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&['inputNotiz','inputMandant'].indexOf(e.target.id)>=0) addEntry();
+  if(e.key==='Escape'){closeEditModal();closeMandantModal();closeModal();}
+  if(e.key==='Enter'){
+    if(['inputNotiz','inputMandant'].indexOf(e.target.id)>=0) addEntry();
+    if(['editVon','editBis','editMandant','editNotiz'].indexOf(e.target.id)>=0) saveEdit();
+  }
 });
 
 /* ── Init ───────────────────────────────────────────────────── */
