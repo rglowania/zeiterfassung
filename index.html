@@ -647,14 +647,15 @@ function render(){
   sorted.forEach(function(name){
     var key='datev_'+currentDate+'_'+name;
     var checked=localStorage.getItem(key)==='1';
-    sc+='<div class="summary-card'+(checked?' checked':'')+'" id="sc-'+esc(name)+'">'+ 
+    var cbId='cb-'+name.replace(/[^a-zA-Z0-9]/g,'_');
+    sc+='<label for="'+cbId+'" class="summary-card'+(checked?' checked':'')+'" style="cursor:pointer;display:block;">'+ 
       '<div class="sc-name">'+esc(name)+'</div>'+
       '<div class="sc-time">'+hhmm(map[name].min)+'<span class="sc-unit"> h</span></div>'+
       '<div class="sc-count">'+map[name].count+' Buchung'+(map[name].count===1?'':'en')+'</div>'+
-      '<label class="sc-check'+(checked?' done':'')+'">'+
-        '<input type="checkbox" '+(checked?'checked':'')+' onchange="toggleDatev(\''+esc(name)+'\',this)"> In DATEV übernommen'+
-      '</label>'+
-      '</div>';
+      '<div class="sc-check'+(checked?' done':'')+'">'+
+        '<input type="checkbox" id="'+cbId+'" '+(checked?'checked':'')+' onchange="toggleDatev(\''+esc(name)+'\',this)"> In DATEV übernommen'+
+      '</div>'+
+      '</label>';
   });
   document.getElementById('summaryGrid').innerHTML=sc;
   document.getElementById('summarySection').style.display='block';
