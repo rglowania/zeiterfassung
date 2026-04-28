@@ -347,7 +347,7 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
       </div>
       <div>
         <input type="text" id="inputMandant" placeholder="M. Mustermann" list="mandantList" autocomplete="off">
-        <div class="hint">Mandant</div>
+        <div class="hint">Mandant (oder Verwaltungsauftrag)</div>
         <datalist id="mandantList"></datalist>
       </div>
       <div>
@@ -659,16 +659,16 @@ var TAETIGKEITEN=[
 function renderPills(){
   var mandants=allMandants();
   document.getElementById('mandantList').innerHTML=mandants.map(function(m){return '<option value="'+esc(m)+'">';}).join('');
-  var cur=document.getElementById('inputNotiz').value;
+  var cur=document.getElementById('inputMandant').value;
   document.getElementById('pillBar').innerHTML=TAETIGKEITEN.map(function(t){
     return '<button class="pill '+(t===cur?'active':'')+'" onclick="selectTaetigkeit(\''+esc(t)+'\')">'+esc(t)+'</button>';
   }).join('');
 }
 
 function selectTaetigkeit(name){
-  document.getElementById('inputNotiz').value=name;
+  document.getElementById('inputMandant').value=name;
   renderPills();
-  document.getElementById('inputMandant').focus();
+  document.getElementById('inputNotiz').focus();
 }
 
 /* ── XLSX Export ────────────────────────────────────────────── */
