@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zeiterfassung</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c1410'/><text y='.9em' font-size='80' font-family='serif' fill='%235d9e7a'>g</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <!-- SheetJS für XLSX -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
 
@@ -48,6 +49,7 @@ body{
   font-family:'IBM Plex Sans',sans-serif;font-weight:300;
   min-height:100vh;padding:40px 20px 80px;
   transition:background .25s,color .25s;
+  font-feature-settings:"ss01";
 }
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -329,8 +331,10 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
   <!-- Date Nav -->
   <div class="date-nav">
     <div class="date-nav-center" id="dateDisplay"></div>
-    <input type="date" id="datePicker">
-    <button type="button" class="btn btn-primary" id="btnToday">Heute</button>
+    <button type="button" class="btn" onclick="navDay(-1)">&#9664;</button>
+    <input type="date" id="datePicker" onchange="navPicker(this.value)">
+    <button type="button" class="btn" onclick="navDay(1)">&#9654;</button>
+    <button type="button" class="btn btn-primary" onclick="navToday()">Heute</button>
   </div>
 
   <!-- Eingabe -->
@@ -406,7 +410,10 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
 
 </div>
 
-<footer>&copy; Robin Glowania &middot; Zuletzt aktualisiert: 28.04.2026</footer>
+<footer>
+  <div style="margin-bottom:6px;opacity:1;font-size:9px;max-width:720px;margin-left:auto;margin-right:auto;line-height:1.6;">Alle Berechnungen sind Näherungswerte auf Basis der jeweils angegebenen Rechtsgrundlagen. Individuelle Faktoren bleiben unberücksichtigt. Kein Ersatz für individuelle Steuer- oder Rechtsberatung &middot; Alle Angaben ohne Gewähr</div>
+  &copy; Robin Glowania &middot; Zuletzt aktualisiert: 06.05.2026
+</footer>
 <div class="g-toast" id="toast"></div>
 
 <script>
@@ -462,16 +469,42 @@ function dateDE(str){
   var d=new Date(str+'T00:00:00');
   return ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+', '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
 }
-function changeDay(delta){
-  var d=new Date(currentDate+'T00:00:00');
+var _navBusy=false;
+function navDay(delta){
+  if(_navBusy)return;
+  _navBusy=true;
+  var d=new Date(currentDate+'T12:00:00');
   d.setDate(d.getDate()+delta);
-  currentDate=d.toISOString().slice(0,10);
-  document.getElementById('datePicker').value=currentDate;
+  currentDate=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  var p=document.getElementById('datePicker');
+  p.setAttribute('value',currentDate);
+  p.defaultValue=currentDate;
+  p.value=currentDate;
+  updateDateDisplay();
   render();
+  setTimeout(function(){_navBusy=false;},300);
 }
-function goToday(){currentDate=todayStr();document.getElementById('datePicker').value=currentDate;render();}
-function onDatePick(v){if(v&&v.length===10){currentDate=v;render();}}
-var datePickerHandler=function(){onDatePick(document.getElementById('datePicker').value);};
+function navToday(){
+  if(_navBusy)return;
+  _navBusy=true;
+  currentDate=todayStr();
+  var p=document.getElementById('datePicker');
+  p.value=currentDate;
+  updateDateDisplay();
+  render();
+  setTimeout(function(){_navBusy=false;},300);
+}
+function navPicker(v){
+  if(_navBusy)return;
+  if(v&&v.length===10){
+    currentDate=v;
+    updateDateDisplay();
+    render();
+  }
+}
+function updateDateDisplay(){
+  document.getElementById('dateDisplay').textContent=dateDE(currentDate);
+}
 
 /* ── Time utils ─────────────────────────────────────────────── */
 function toMin(t){if(!t)return null;var p=t.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
@@ -577,11 +610,7 @@ function selectMandant(name){
 }
 
 function render(){
-  document.getElementById('dateDisplay').textContent=dateDE(currentDate);
-  var picker=document.getElementById('datePicker');
-  picker.removeEventListener('input',onDatePick);
-  picker.value=currentDate;
-  picker.addEventListener('input',datePickerHandler);
+  updateDateDisplay();
   renderPills();
 
   var entries=getEntries();
@@ -884,8 +913,6 @@ document.addEventListener('keydown',function(e){
 
 /* ── Init ───────────────────────────────────────────────────── */
 window.addEventListener('load',function(){
-  document.getElementById('btnToday').addEventListener('click',function(){goToday();});
-  document.getElementById('datePicker').addEventListener('input',datePickerHandler);
   var now=new Date();
   var m=Math.round(now.getMinutes()/15)*15;
   var h=now.getHours()+(m>=60?1:0);m=m%60;
@@ -894,6 +921,7 @@ window.addEventListener('load',function(){
   document.getElementById('inputBis').value=fromMin(toMin(vonStr)+15);
   document.getElementById('inputBis').classList.add('auto-val');
   bisAuto=true;
+  document.getElementById('datePicker').value=currentDate;
   render();
 });
 </script>
