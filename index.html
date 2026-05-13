@@ -364,7 +364,16 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
         <datalist id="mandantList"></datalist>
       </div>
       <div>
-        <input type="text" id="inputNotiz" placeholder="z. B. ESt (optional)">
+        <div style="display:flex;gap:6px;">
+          <select id="inputNotizSelect" onchange="applyNotizSelect(this.value)" style="flex:0 0 auto;width:auto;max-width:120px;">
+            <option value="">– Auswahl –</option>
+            <option value="ESt">ESt</option>
+            <option value="Bescheidprüfung">Bescheidprüfung</option>
+            <option value="EÜR">EÜR</option>
+            <option value="JA">JA</option>
+          </select>
+          <input type="text" id="inputNotiz" placeholder="Freie Eingabe (optional)" style="flex:1;">
+        </div>
         <div class="hint">Tätigkeit / Notiz</div>
       </div>
     </div>
@@ -594,6 +603,7 @@ function addEntry(){
   document.getElementById('inputBis').classList.add('auto-val');
   document.getElementById('bisHint').textContent='+15 min';
   document.getElementById('inputNotiz').value='';
+  document.getElementById('inputNotizSelect').value='';
   document.getElementById('inputMandant').value='';
   document.getElementById('inputMandant').focus();
 
@@ -703,7 +713,10 @@ function renderPills(){
   }).join('');
 }
 
-function selectTaetigkeit(name){
+function applyNotizSelect(val){
+  if(val) document.getElementById('inputNotiz').value=val;
+  document.getElementById('inputNotizSelect').value='';
+}
   document.getElementById('inputMandant').value=name;
   renderPills();
   document.getElementById('inputNotiz').focus();
