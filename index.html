@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zeiterfassung</title>
+<title>Feierabend-Uhr</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230c1410'/><text x='16' y='23' font-family='Georgia,serif' font-size='22' font-weight='700' fill='%235d9e7a' text-anchor='middle'>g</text></svg>">
+<link rel="apple-touch-icon" href="https://rglowania.github.io/gtools/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- SheetJS für XLSX -->
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <style>
 
 /* ═══════════════════════════════════════════════════════════════
-   G-DESIGN — Template v1.0  (unverändert)
+   G-DESIGN — Template v1.0 (unverändert)
    ═══════════════════════════════════════════════════════════════ */
+
+/* ── Tokens ─────────────────────────────────────────────────── */
 :root,[data-theme="dark"]{
   --bg:        #0c1410;
   --surface:   #13201a;
@@ -43,13 +43,16 @@
     --text:#0f1f16;--text-muted:#4d7a5e;
   }
 }
+
+/* ── Reset ──────────────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;}
+
+/* ── Body & Background Grid ─────────────────────────────────── */
 body{
   background:var(--bg);color:var(--text);
   font-family:'IBM Plex Sans',sans-serif;font-weight:300;
   min-height:100vh;padding:40px 20px 80px;
   transition:background .25s,color .25s;
-  font-feature-settings:"ss01";
 }
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -58,9 +61,11 @@ body::before{
     linear-gradient(90deg,rgba(93,158,122,0.04) 1px,transparent 1px);
   background-size:40px 40px;
 }
+
+/* ── Layout ─────────────────────────────────────────────────── */
 .container{max-width:920px;margin:0 auto;position:relative;z-index:1;}
 
-/* Theme Toggle */
+/* ── Theme Toggle ───────────────────────────────────────────── */
 .theme-toggle{
   position:fixed;top:18px;right:20px;display:flex;gap:3px;
   z-index:1000;background:var(--surface);border:1px solid var(--border);padding:4px;
@@ -74,8 +79,14 @@ body::before{
 .theme-btn.active{color:var(--accent);background:var(--accent-dim);}
 .theme-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
-/* Header */
-header{text-align:center;margin-bottom:24px;}
+/* ── Header ─────────────────────────────────────────────────── */
+header{text-align:center;margin-bottom:48px;}
+.badge{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent-dim);
+  padding:4px 14px;margin-bottom:18px;
+}
 h1{
   font-family:'Playfair Display',serif;
   font-size:clamp(26px,5vw,44px);font-weight:600;
@@ -86,8 +97,20 @@ h1 span{color:var(--accent);}
   font-size:12px;color:var(--text-muted);
   font-family:'IBM Plex Mono',monospace;letter-spacing:0.5px;
 }
+.subtitle-row{
+  display:flex;justify-content:center;align-items:center;
+  gap:14px;flex-wrap:wrap;margin-bottom:6px;
+}
+.gtools-link{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-muted);text-decoration:none;
+  border:1px solid var(--border);padding:3px 10px;
+  transition:color .2s,border-color .2s;
+}
+.gtools-link:hover{color:var(--accent);border-color:var(--accent);}
 
-/* Card */
+/* ── Card ───────────────────────────────────────────────────── */
 .card{
   background:var(--surface);border:1px solid var(--border);
   padding:24px 28px;margin-bottom:16px;
@@ -103,20 +126,19 @@ h1 span{color:var(--accent);}
   color:var(--accent);margin-bottom:18px;
 }
 
-/* Accent Card */
+/* ── Accent Card ────────────────────────────────────────────── */
 .accent-card{
   background:var(--surface);border:1px solid var(--accent);
-  padding:28px;margin-top:16px;transition:background .25s;
+  padding:28px;margin-bottom:16px;transition:background .25s;
 }
 
-/* Inputs */
+/* ── Formular-Elemente ──────────────────────────────────────── */
 select,input[type="number"],input[type="text"],input[type="time"]{
   width:100%;background:var(--surface2);border:1px solid var(--border);
   color:var(--text);font-family:'IBM Plex Mono',monospace;
   font-size:12px;padding:6px 8px;outline:none;
   transition:border-color .2s,background .25s;
 }
-input[type="time"]{padding:6px 2px 6px 4px;}
 select:focus,input:focus{border-color:var(--accent);}
 .hint{
   font-size:10px;color:var(--text-muted);margin-top:5px;
@@ -124,7 +146,7 @@ select:focus,input:focus{border-color:var(--accent);}
 }
 .hint b{color:var(--accent-lt);}
 
-/* Buttons */
+/* ── Buttons ────────────────────────────────────────────────── */
 .btn{
   display:inline-flex;align-items:center;gap:8px;
   background:transparent;border:1px solid var(--border);
@@ -135,124 +157,114 @@ select:focus,input:focus{border-color:var(--accent);}
 .btn:hover{border-color:var(--accent);color:var(--accent);}
 .btn-primary{border-color:var(--accent);color:var(--accent);}
 .btn-primary:hover{background:var(--accent-dim);}
-.btn-dashed{border-style:dashed;}
-.btn-danger:hover{border-color:#c0554a;color:#c0554a;}
 
-/* Result rows */
-.result-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;
-}
-.result-row:last-child{border-bottom:none;}
-.result-row .rl{color:var(--text-muted);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;max-width:68%;}
-.result-row .rv{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:400;white-space:nowrap;}
-.result-total{
-  display:flex;justify-content:space-between;align-items:baseline;
-  padding-top:18px;border-top:1px solid var(--accent);margin-top:8px;
-}
-.result-total-label,.result-total-value{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:400;}
-
-.note{font-size:10px;color:var(--text-muted);margin-top:14px;line-height:1.7;font-family:'IBM Plex Mono',monospace;}
-
+/* ── Footer ─────────────────────────────────────────────────── */
 footer{
   text-align:center;padding:32px 0 24px;
   font-family:'IBM Plex Mono',monospace;font-size:10px;
   letter-spacing:1px;color:var(--text-muted);opacity:0.6;
 }
-@media(max-width:680px){.card,.accent-card{padding:18px 16px;}}
-.form-grid{display:grid;grid-template-columns:72px 72px 1fr 1fr;gap:12px;align-items:start;}
+
+/* ── Responsive ─────────────────────────────────────────────── */
 @media(max-width:680px){
-  .form-grid{grid-template-columns:1fr 1fr;}
-  .form-grid .col-mandant,.form-grid .col-taet{grid-column:span 2;}
-  .form-grid .col-taet .select-input-wrap{flex-direction:row;}
+  .card,.accent-card{padding:18px 16px;}
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   APP-SPEZIFISCH
+   ENDE DESIGN SYSTEM — ab hier App-spezifisches CSS
    ═══════════════════════════════════════════════════════════════ */
 
-/* Date Nav */
-.date-nav{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
-.date-nav-center{flex:1;text-align:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:600;}
-input[type="date"]{
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text);font-family:'IBM Plex Mono',monospace;
-  font-size:11px;padding:5px 8px;outline:none;transition:border-color .2s;cursor:pointer;
+/* ── Uhr & Live-Anzeige ─────────────────────────────────────── */
+.live-row{
+  display:flex;justify-content:center;align-items:center;
+  gap:24px;margin-bottom:8px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;letter-spacing:1.5px;color:var(--text-muted);
 }
-input[type="date"]:focus{border-color:var(--accent);}
-[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer;}
-[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.2);cursor:pointer;}
-:root:not([data-theme]) input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer;}
-
-/* Time field – Uhr-Symbol verstecken + auto highlight */
-input[type="time"]::-webkit-calendar-picker-indicator{display:none;}
-input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
-
-/* Icon-Buttons in Tabelle */
-.btn-icon{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:3px 5px;transition:color .2s;line-height:1;display:inline-flex;align-items:center;}
-.btn-icon.edit:hover{color:var(--accent);}
-.btn-icon.del:hover{color:#c0554a;}
-.btn-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-
-/* Summary card checked / abgehakt */
-.summary-card.checked{opacity:0.55;}
-.summary-card.checked .sc-name,.summary-card.checked .sc-time,.summary-card.checked .sc-count{text-decoration:line-through;color:var(--text-muted)!important;}
-.sc-check{display:flex;align-items:center;gap:6px;margin-top:10px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-muted);user-select:none;}
-.sc-check input{accent-color:var(--accent);width:12px;height:12px;cursor:pointer;}
-.sc-check.done{color:var(--accent-lt);}
-
-/* Pill bar */
-.pill-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;}
-.pill{
-  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;
-  padding:3px 12px;background:transparent;border:1px solid var(--border);
-  color:var(--text-muted);cursor:pointer;transition:all .2s;
+#live-time{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.2rem,5vw,3rem);font-weight:600;
+  color:var(--text);letter-spacing:-0.02em;
+  display:block;text-align:center;margin-bottom:4px;
 }
-.pill:hover,.pill.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+#weekday{text-transform:uppercase;letter-spacing:3px;}
+#mode-indicator{font-size:10px;letter-spacing:1px;color:var(--text-muted);}
 
-/* Table */
-.zt-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;}
-.zt-table thead tr{border-bottom:1px solid var(--border);}
-.zt-table th{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:left;padding:6px 10px;font-weight:400;}
-.zt-table tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
-.zt-table tbody tr:last-child{border-bottom:none;}
-.zt-table tbody tr:hover{background:var(--accent-dim);}
-.zt-table td{padding:8px 10px;font-size:12px;}
-.zt-table td.td-time{color:var(--text-muted);font-size:11px;}
-.zt-table td.td-dur{color:var(--accent);font-weight:500;}
-.zt-table td.td-note{color:var(--text-muted);font-size:10px;letter-spacing:.5px;}
-.zt-table td.td-act{text-align:right;}
-.zt-table .empty-row td{text-align:center;padding:28px;color:var(--text-muted);font-size:11px;letter-spacing:1px;}
+/* ── Countdown Display ──────────────────────────────────────── */
+.countdown-display{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.6rem,7vw,4.2rem);font-weight:600;
+  color:var(--text);line-height:1;letter-spacing:-0.02em;
+  margin-bottom:8px;
+}
+.countdown-sub{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:1px;color:var(--text-muted);margin-bottom:16px;
+}
+.done-msg{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1.4rem,4vw,2rem);color:var(--accent);
+}
 
-/* Summary grid */
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:16px;}
-.summary-card{background:var(--surface);border:1px solid var(--border);padding:14px 16px;position:relative;transition:background .25s;}
-.summary-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent-lt);}
-.summary-card .sc-name{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;}
-.summary-card .sc-time{font-family:'Playfair Display',serif;font-size:22px;color:var(--accent-lt);line-height:1;}
-.summary-card .sc-unit{font-size:11px;color:var(--text-muted);margin-left:1px;}
-.summary-card .sc-count{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:4px;letter-spacing:.5px;}
+/* ── Progress ───────────────────────────────────────────────── */
+.progress-wrap{height:2px;background:var(--border);overflow:hidden;margin-bottom:6px;}
+.progress-bar{height:100%;background:var(--accent);transition:width 1s linear;}
+.progress-labels{
+  display:flex;justify-content:space-between;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;
+  letter-spacing:1px;color:var(--text-muted);
+}
 
-/* Count badge */
-.count-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-muted);border:1px solid var(--border);padding:2px 10px;margin-left:auto;}
+/* ── Card header row ────────────────────────────────────────── */
+.card-header-row{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;
+}
+.card-header-row .card-title{margin-bottom:0;}
+.drink-emoji{font-size:1.6rem;line-height:1;}
 
-/* Toast */
-.g-toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--accent);color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.5px;padding:9px 16px;z-index:999;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;}
-.g-toast.show{opacity:1;transform:translateY(0);}
+/* ── Wisdom ─────────────────────────────────────────────────── */
+.wisdom-inner{display:flex;gap:14px;align-items:flex-start;}
+.wisdom-icon{font-size:1.4rem;flex-shrink:0;margin-top:3px;}
+.wisdom-text{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1rem,2.5vw,1.2rem);color:var(--text);line-height:1.55;
+}
+.wisdom-source{
+  display:block;font-family:'IBM Plex Mono',monospace;
+  font-size:9px;letter-spacing:1.5px;color:var(--text-muted);margin-top:8px;
+}
 
-/* Reload warning modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
-.modal-overlay.show{opacity:1;pointer-events:all;}
-.modal{background:var(--surface);border:1px solid var(--accent);padding:32px 36px;max-width:460px;width:90%;font-family:'IBM Plex Mono',monospace;}
-.modal-title{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;}
-.modal-body{font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:24px;}
-.modal-body b{color:var(--accent-lt);}
-.modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+/* ── Weekend Banner ─────────────────────────────────────────── */
+#weekend-banner{display:none;}
+
+/* ── Settings ───────────────────────────────────────────────── */
+.settings-toggle{
+  background:none;border:none;color:var(--text-muted);
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;gap:8px;width:100%;padding:0;transition:color .2s;
+}
+.settings-toggle:hover{color:var(--accent);}
+.settings-toggle .arrow{display:inline-block;transition:transform .2s;font-size:9px;}
+.settings-toggle.open .arrow{transform:rotate(90deg);}
+.settings-body{display:flex;flex-direction:column;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.settings-body.hidden{display:none;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.setting-row label{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);flex-shrink:0;
+}
+.setting-row input[type="time"]{width:auto;color-scheme:dark;}
+[data-theme="light"] .setting-row input[type="time"]{color-scheme:light;}
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.pulsing{animation:pulse 2s ease-in-out infinite;}
 </style>
 </head>
 <body>
 
-<!-- Theme Toggle -->
+<!-- ── Theme Toggle ─────────────────────────────────────────── -->
 <div class="theme-toggle">
   <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')" title="Dunkel">
     <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -265,605 +277,649 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
   </button>
 </div>
 
-<!-- Edit Entry Modal -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <div class="modal-title">Buchung bearbeiten</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-      <div>
-        <input type="time" id="editVon" step="300" onkeydown="timeKeydown(event,'editVon')">
-        <div class="hint">Von</div>
-      </div>
-      <div>
-        <input type="time" id="editBis" step="300" onkeydown="timeKeydown(event,'editBis')">
-        <div class="hint">Bis</div>
-      </div>
-      <div>
-        <input type="text" id="editMandant" placeholder="Mandant" list="mandantList">
-        <div class="hint">Mandant</div>
-      </div>
-      <div>
-        <input type="text" id="editNotiz" placeholder="Tätigkeit (optional)">
-        <div class="hint">Tätigkeit</div>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" onclick="saveEdit()">Speichern</button>
-      <button class="btn" onclick="closeEditModal()">Abbrechen</button>
-    </div>
-  </div>
-</div>
-
-<!-- Mandanten-Verwaltung Modal -->
-<div class="modal-overlay" id="reloadModal">
-  <div class="modal">
-    <div class="modal-title">⚠ Seite neu laden?</div>
-    <div class="modal-body">
-      <b>Achtung:</b> Beim Neu­laden der Seite gehen alle nicht gespeicherten Buchungen unwiderruflich verloren.<br><br>
-      Bitte exportiere deine Daten vor dem Neu­laden als <b>XLSX</b>.
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-danger" onclick="confirmReload()">Trotzdem neu laden</button>
-      <button class="btn btn-primary" onclick="exportXLSX();closeModal()">XLSX exportieren</button>
-      <button class="btn" onclick="closeModal()">Abbrechen</button>
-    </div>
-  </div>
-</div>
-
+<!-- ════════════════════════════════════════════════════════════
+     APP CONTENT
+     ════════════════════════════════════════════════════════════ -->
 <div class="container">
 
   <header>
-    <h1>Zeit<span>erfassung</span></h1>
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
-    <p class="subtitle" style="margin:0">Lokal &middot; Tagesbasiert &middot; XLSX Export &amp; Import</p>
-      <a href="https://rglowania.github.io/gtools/" target="_blank"
-         style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;
-                color:var(--text-muted);text-decoration:none;
-                border:1px solid var(--border);padding:2px 8px;white-space:nowrap;
-                transition:color .15s,border-color .15s;"
-         onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
-         onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border)'">&#8599; Part of gTools</a>
+    <h1>Feier<span>abend</span>-Uhr</h1>
+    <div class="subtitle-row">
+      <p class="subtitle">Deine Zeit &middot; Dein Feierabend</p>
+      <a class="gtools-link" href="https://rglowania.github.io/gtools/">Part of gTools &nearr;</a>
+    </div>
+    <span id="live-time">00:00:00</span>
+    <div class="live-row">
+      <span id="weekday">–</span>
+      <span id="mode-indicator">–</span>
     </div>
   </header>
 
-  <!-- Date Nav -->
-  <div class="date-nav">
-    <div class="date-nav-center" id="dateDisplay"></div>
-    <button type="button" class="btn" onclick="navDay(-1)">&#9664;</button>
-    <input type="date" id="datePicker" onchange="navPicker(this.value)">
-    <button type="button" class="btn" onclick="navDay(1)">&#9654;</button>
-    <button type="button" class="btn btn-primary" onclick="navToday()">Heute</button>
-  </div>
-
-  <!-- Eingabe -->
+  <!-- Büro-Weisheit -->
   <div class="card">
-    <div class="card-title">Neue Buchung</div>
-    <div class="form-grid">
+    <div class="card-title">Weisheit des Tages</div>
+    <div class="wisdom-inner">
+      <div class="wisdom-icon" id="wisdom-icon">💼</div>
       <div>
-        <input type="time" id="inputVon" step="300" oninput="onVonChange()" onkeydown="timeKeydown(event,'inputVon')">
-        <div class="hint">Von</div>
-      </div>
-      <div>
-        <input type="time" id="inputBis" step="300" class="auto-val" oninput="onBisManual()" onkeydown="timeKeydown(event,'inputBis')">
-        <div class="hint"><b id="bisHint">+15 min</b></div>
-      </div>
-      <div class="col-mandant">
-        <input type="text" id="inputMandant" placeholder="M. Mustermann" list="mandantList" autocomplete="off">
-        <div class="hint">Mandant (oder Verwaltungsauftrag)</div>
-        <datalist id="mandantList"></datalist>
-      </div>
-      <div class="col-taet">
-        <div class="select-input-wrap" style="display:flex;gap:6px;">
-          <select id="inputNotizSelect" onchange="applyNotizSelect(this.value)" style="flex:0 0 auto;width:auto;max-width:120px;">
-            <option value="">– Auswahl –</option>
-            <option value="ESt">ESt</option>
-            <option value="Bescheidprüfung">Bescheidprüfung</option>
-            <option value="EÜR">EÜR</option>
-            <option value="JA">JA</option>
-          </select>
-          <input type="text" id="inputNotiz" placeholder="Freie Eingabe (optional)" style="flex:1;min-width:0;">
-        </div>
-        <div class="hint">Tätigkeit / Notiz</div>
-      </div>
-    </div>
-    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      <button class="btn btn-primary" onclick="addEntry()">+ Buchen</button>
-      <button class="btn btn-dashed btn-danger" onclick="clearDay()">Tag löschen</button>
-      <span class="count-badge" id="entryCount">0 Einträge</span>
-    </div>
-    <div class="pill-bar" id="pillBar"></div>
-  </div>
-
-  <!-- Buchungstabelle -->
-  <div class="card" style="padding-left:3px;">
-    <div style="padding:24px 28px 24px 25px;">
-      <div class="card-title">Buchungen</div>
-      <div style="overflow-x:auto;">
-        <table class="zt-table">
-          <thead>
-            <tr><th>Von</th><th>Bis</th><th>Dauer</th><th>Mandant</th><th>Tätigkeit</th><th></th></tr>
-          </thead>
-          <tbody id="entriesBody">
-            <tr class="empty-row"><td colspan="6">Noch keine Buchungen für diesen Tag.</td></tr>
-          </tbody>
-        </table>
+        <div class="wisdom-text" id="wisdom-text">…</div>
+        <span class="wisdom-source" id="wisdom-source"></span>
       </div>
     </div>
   </div>
 
-  <!-- Mandanten-Übersicht (Kacheln) -->
-  <div id="summarySection" style="display:none;margin-bottom:16px;">
-    <div class="card-title" style="padding-left:0;">Mandanten-Übersicht</div>
-    <div class="summary-grid" id="summaryGrid"></div>
+  <!-- Wochenende-Banner -->
+  <div id="weekend-banner">
+    <div class="accent-card" style="text-align:center;padding:40px 28px;">
+      <div style="font-size:2.5rem;margin-bottom:12px;" id="we-emoji">🎉</div>
+      <h1 style="margin-bottom:8px;">Wochen<span>ende</span>!</h1>
+      <p class="subtitle">Genieß es &mdash; Montag kommt früh genug.</p>
+    </div>
   </div>
 
-  <!-- Tages-Gesamt + Export -->
-  <div class="accent-card">
-    <div class="result-total" style="padding-top:0;border-top:none;margin-top:0;">
-      <span class="result-total-label" style="font-weight:700;">Gesamtzeit</span>
-      <span class="result-total-value" id="dayTotal">0:00 h</span>
+  <!-- Card: Bis Feierabend -->
+  <div class="card" id="card-feierabend">
+    <div class="card-header-row">
+      <div class="card-title">Bis Feierabend heute</div>
+      <div class="drink-emoji" id="drink-emoji">🍺</div>
     </div>
-    <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="exportXLSX()">&#8595; XLSX Export</button>
-      <label class="btn" style="cursor:pointer;" title="Zuvor exportierte XLSX-Datei laden">&#8593; XLSX Import<input type="file" id="importFile" accept=".xlsx" style="display:none;" onchange="importXLSX(this)"></label>
+    <div id="feierabend-display" class="countdown-display">–</div>
+    <div id="feierabend-sub" class="countdown-sub">–</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-feierabend" style="width:0%"></div>
     </div>
-    <div style="margin-top:20px;border:1px solid #c0554a;padding:12px 16px;display:flex;gap:10px;align-items:flex-start;">
-      <span style="font-size:16px;line-height:1;flex-shrink:0;">⚠</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#e07060;line-height:1.7;letter-spacing:.3px;">
-        Daten werden <b style="color:#e07060;">nur lokal im Browser</b> gespeichert und können beim Schließen oder Neu­laden der Seite verloren gehen. Sie haben die Möglichkeit, vor dem Schließen als <b style="color:#e07060;">XLSX zu exportieren.</b>
-      </span>
+    <div class="progress-labels">
+      <span id="label-start">–</span>
+      <span id="label-end">–</span>
+    </div>
+  </div>
+
+  <!-- Card: Bis zum Wochenende -->
+  <div class="card" id="card-weekend">
+    <div class="card-header-row">
+      <div class="card-title">Bis zum Wochenende</div>
+      <div class="drink-emoji" id="drink-emoji-we">🍺🍺🍺</div>
+    </div>
+    <div id="weekend-display" class="countdown-display">–</div>
+    <div id="weekend-sub" class="countdown-sub">–</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-weekend" style="width:0%"></div>
+    </div>
+    <div class="progress-labels">
+      <span>Mo 00:00</span>
+      <span>Fr Feierabend</span>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card">
+    <button class="settings-toggle open" id="toggle-btn" onclick="toggleSettings()">
+      <span class="arrow">▶</span> Arbeitszeiten anpassen
+    </button>
+    <div class="settings-body" id="settings-body">
+      <div class="setting-row">
+        <label>Arbeitsbeginn</label>
+        <input type="time" id="input-start" value="07:30">
+      </div>
+      <div class="setting-row">
+        <label>Feierabend</label>
+        <input type="time" id="input-end" value="16:00">
+      </div>
     </div>
   </div>
 
 </div>
 
-<footer>
-  &copy; Robin Glowania &middot; Zuletzt aktualisiert: 19.05.2026
-</footer>
-<div class="g-toast" id="toast"></div>
+<footer>&copy; Robin Glowania &middot; Zuletzt aktualisiert: 19.05.2026</footer>
 
+<!-- ════════════════════════════════════════════════════════════
+     JAVASCRIPT — Theme-Block nie ändern
+     ════════════════════════════════════════════════════════════ -->
 <script>
-/* ── Theme (gTemplate, unverändert) ─────────────────────────── */
-function setTheme(t){
-  if(t==='system') document.documentElement.removeAttribute('data-theme');
-  else document.documentElement.setAttribute('data-theme',t);
-  try{localStorage.setItem('g-theme',t);}catch(e){}
-  document.querySelectorAll('.theme-btn').forEach(function(b){b.classList.remove('active');});
-  var btn=document.getElementById('btn-'+t);
-  if(btn) btn.classList.add('active');
+// ── Theme ──────────────────────────────────────────────────────
+function setTheme(t) {
+  if (t === 'system') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', t);
+  }
+  try { localStorage.setItem('g-theme', t); } catch(e){}
+  document.querySelectorAll('.theme-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.getElementById('btn-' + t);
+  if (btn) btn.classList.add('active');
 }
 (function(){
-  var saved='system';
-  try{saved=localStorage.getItem('g-theme')||'system';}catch(e){}
+  var saved = 'system';
+  try { saved = localStorage.getItem('g-theme') || 'system'; } catch(e){}
   setTheme(saved);
 })();
 
-/* ── Reload-Warnung ─────────────────────────────────────────── */
-var allowReload=false;
-window.addEventListener('beforeunload',function(e){
-  if(getEntries().length>0&&!allowReload){
-    e.preventDefault();
-    e.returnValue='';
-  }
+// ════════════════════════════════════════════════════════════════
+// APP-SPEZIFISCHER CODE
+// ════════════════════════════════════════════════════════════════
+
+const WEISHEITEN = [
+  {text:"Arbeit ist die beste Methode, um die Zeit totzuschlagen, bis man sterben kann.",icon:"⚰️",quelle:"— Nachdenklicher Kollege, Kaffeeküche"},
+  {text:"Montag ist der Beweis, dass das Wochenende zu kurz ist.",icon:"😩",quelle:"— Allgemein bekannte Wahrheit"},
+  {text:"Der frühe Vogel kann mich mal. Ich bin eine Eule.",icon:"🦉",quelle:"— Jeder vor dem zweiten Kaffee"},
+  {text:"Wenn du nicht weißt, was du tun sollst, simuliere Beschäftigung.",icon:"🖥️",quelle:"— Überlieferte Büroweisheit"},
+  {text:"Meetings sind Veranstaltungen, bei denen Minuten protokolliert und Stunden verschwendet werden.",icon:"📋",quelle:"— Unbekannt, aber weise"},
+  {text:"Hard work pays off in the future. Laziness pays off now.",icon:"🛋️",quelle:"— Steven Wright"},
+  {text:"Das Büro: Ein Ort, wo man die Zeit totschlägt, bis die Zeit einen totschlägt.",icon:"🕰️",quelle:"— Kaffeetassen-Philosophie"},
+  {text:"Ich bin nicht faul. Ich bin im Energiesparmodus.",icon:"🔋",quelle:"— Moderne Selbstoptimierung"},
+  {text:"Für jeden komplexen Vorgang gibt es eine klare, einfache und falsche Lösung.",icon:"🤔",quelle:"— H. L. Mencken"},
+  {text:"Teamwork heißt: Du machst die Arbeit, alle feiern den Erfolg.",icon:"🎉",quelle:"— Erfahrener Projektmitarbeiter"},
+  {text:"Excel ist kein ERP-System. Aber irgendwie doch.",icon:"📊",quelle:"— Jedes mittelständische Unternehmen"},
+  {text:"Wer zuerst kommt, malt zuerst. Wer zuletzt geht, macht das Licht aus.",icon:"💡",quelle:"— Büro-Darwinismus"},
+  {text:"Die Hälfte meiner Arbeit besteht darin, so zu tun, als würde ich arbeiten.",icon:"🎭",quelle:"— Ehrliches LinkedIn-Profil"},
+  {text:"Wenn alles dringend ist, ist nichts dringend.",icon:"🚨",quelle:"— Projektmanager-Paradoxon"},
+  {text:"Der Drucker funktioniert nur, wenn niemand ihn braucht.",icon:"🖨️",quelle:"— Quantenphysik des Büros"},
+  {text:"In keinem Meeting wurde je eine Entscheidung getroffen, für die man ein Meeting brauchte.",icon:"🎪",quelle:"— Kaffeepausenweisheit"},
+  {text:"Ich gebe 100% bei der Arbeit: 12% Montag, 23% Dienstag, 40% Mittwoch, 20% Donnerstag, 5% Freitag.",icon:"📈",quelle:"— Ehrliche Wochenplanung"},
+  {text:"Das Wochenende ist wie ein Regenbogen: Es sieht gut aus und dauert nicht lange.",icon:"🌈",quelle:"— Traurige Wahrheit"},
+  {text:"Ich bin nicht müde. Mein Körper ist nur im Eco-Modus.",icon:"😴",quelle:"— Jeder nach der Mittagspause"},
+  {text:"Man sieht nur mit dem Kaffee gut. Das Wesentliche ist dem Auge unsichtbar.",icon:"☕",quelle:"— Frei nach Saint-Exupéry"},
+  {text:"Die beste Idee im Meeting kommt immer 5 Minuten nachdem das Meeting vorbei ist.",icon:"💡",quelle:"— Treppengeist des Büros"},
+  {text:"Deadline: Der Zeitpunkt, an dem Panik kreativ wird.",icon:"⏰",quelle:"— Erfahrungsbasierte Erkenntnis"},
+  {text:"Out of office: In Wirklichkeit in office, aber seelisch schon am Strand.",icon:"🏖️",quelle:"— Jede E-Mail-Abwesenheitsnotiz"},
+  {text:"Wer nichts tut, kann nichts falsch machen. Wer nichts falsch macht, wird befördert.",icon:"📎",quelle:"— Peter-Prinzip light"},
+  {text:"Feierabend ist nicht das Ende des Tages. Es ist der Anfang des Lebens.",icon:"🌅",quelle:"— Philosophie des gesunden Menschenverstands"},
+  {text:"Die Arbeit vertreibt drei große Übel: Langeweile, Laster und Armut.",icon:"⚒️",quelle:"— Voltaire"},
+  {text:"Wähle einen Beruf, den du liebst, und du brauchst keinen Tag in deinem Leben zu arbeiten.",icon:"❤️",quelle:"— Konfuzius"},
+  {text:"Der einzige Weg, großartige Arbeit zu leisten, ist zu lieben, was man tut.",icon:"🌟",quelle:"— Steve Jobs"},
+  {text:"Erfolg ist die Summe kleiner Anstrengungen, die Tag für Tag wiederholt werden.",icon:"🏆",quelle:"— Robert Collier"},
+  {text:"Die meisten Menschen verbringen mehr Zeit damit, über Probleme zu reden, als sie zu lösen.",icon:"💬",quelle:"— Henry Ford"},
+  {text:"Es ist nicht genug, beschäftigt zu sein. Die Frage ist: Womit beschäftigen wir uns?",icon:"🦦",quelle:"— Henry David Thoreau"},
+  {text:"Tue, was du kannst, mit dem, was du hast, dort wo du bist.",icon:"📍",quelle:"— Theodore Roosevelt"},
+  {text:"Der Unterschied zwischen dem Möglichen und dem Unmöglichen liegt im Willen.",icon:"💪",quelle:"— Tommy Lasorda"},
+  {text:"Qualität bedeutet, das Richtige zu tun, auch wenn niemand zuschaut.",icon:"👁️",quelle:"— Henry Ford"},
+  {text:"Wer aufhört, besser zu werden, hat aufgehört, gut zu sein.",icon:"📉",quelle:"— Philip Rosenthal"},
+  {text:"Nicht die Stärksten überleben, sondern die Anpassungsfähigsten.",icon:"🦎",quelle:"— Charles Darwin"},
+  {text:"Das Geheimnis des Fortkommens ist der Anfang.",icon:"🚀",quelle:"— Mark Twain"},
+  {text:"Alle großen Leistungen erfordern Zeit.",icon:"⌛",quelle:"— Maya Angelou"},
+  {text:"Innovation unterscheidet einen Anführer von einem Mitläufer.",icon:"💡",quelle:"— Steve Jobs"},
+  {text:"Wenn du schnell gehen willst, geh allein. Wenn du weit gehen willst, geh zusammen.",icon:"🤝",quelle:"— Afrikanisches Sprichwort"},
+  {text:"Es ist leichter, entschuldigend um Verzeihung zu bitten, als um Erlaubnis.",icon:"🙏",quelle:"— Grace Hopper"},
+  {text:"Perfektion ist nicht erreichbar, aber wenn wir sie anstreben, können wir Exzellenz erreichen.",icon:"⭐",quelle:"— Vince Lombardi"},
+  {text:"Der beste Zeitpunkt, einen Baum zu pflanzen, war vor 20 Jahren. Der zweitbeste ist jetzt.",icon:"🌳",quelle:"— Chinesisches Sprichwort"},
+  {text:"Der Mensch ist das einzige Lebewesen, das errötet. Oder es nötig hat.",icon:"😊",quelle:"— Mark Twain"},
+  {text:"Der Schlüssel ist nicht, die Zeit zu priorisieren, sondern die Prioritäten zu terminieren.",icon:"🗝️",quelle:"— Stephen Covey"},
+  {text:"Wir sind, was wir wiederholt tun. Exzellenz ist daher keine Handlung, sondern eine Gewohnheit.",icon:"🔄",quelle:"— Aristoteles"},
+  {text:"Wenn du denkst, du kannst oder du kannst nicht — in beiden Fällen hast du recht.",icon:"🧠",quelle:"— Henry Ford"},
+  {text:"Es gibt keine Abkürzung zu einem Ort, der es wert ist zu gehen.",icon:"🛤️",quelle:"— Beverly Sills"},
+  {text:"Das Beste an der Zukunft ist, dass sie immer einen Tag nach dem anderen kommt.",icon:"📅",quelle:"— Abraham Lincoln"},
+  {text:"Kreativität ist Intelligenz, die Spaß hat.",icon:"🎨",quelle:"— Albert Einstein (zugeschr.)"},
+  {text:"Ein Büro ist ein Ort, an dem man täglich beweist, dass man nicht unersetzlich ist.",icon:"🪑",quelle:"— Bitterweiser Kollege"},
+  {text:"CC: alle. Warum? Keine Ahnung. Tradition.",icon:"📧",quelle:"— E-Mail-Kultur, 1997–heute"},
+  {text:"Das Passwort muss 8 Zeichen haben. Ich tippe: Schneewittchen. Das sind 13 Zwerge.",icon:"🔑",quelle:"— IT-Hotline-Klassiker"},
+  {text:"Ich arbeite gerne im Team — solange ich alleine entscheide.",icon:"👑",quelle:"— Jede Führungskraft"},
+  {text:"Der Unterschied zwischen Chaos und Struktur ist meistens ein Meeting.",icon:"🌀",quelle:"— Erfahrener Projektleiter"},
+  {text:"Freitagnachmittags-Meetings sind eine Form der Grausamkeit.",icon:"😤",quelle:"— Allgemeiner Konsens"},
+  {text:"Ich bin sehr beschäftigt damit, sehr beschäftigt auszusehen.",icon:"💼",quelle:"— Produktiver Mitarbeiter des Monats"},
+  {text:"Das Beste an Remote Work ist, dass niemand sieht, was du anhast.",icon:"🩳",quelle:"— Homeoffice-Pionier"},
+  {text:"Status-Update: noch am Leben, aber innerlich schon im Feierabend.",icon:"🫥",quelle:"— Interne Kommunikation"},
+  {text:"Jedes Problem hat eine Lösung, die einfach, klar und falsch ist.",icon:"❌",quelle:"— H. L. Mencken"},
+  {text:"Ich trinke Kaffee, damit ich mit Menschen sprechen kann, die keinen Kaffee trinken.",icon:"☕",quelle:"— Koffeinhörige weltweit"},
+  {text:"Manchmal ist die beste Antwort auf eine E-Mail keine Antwort.",icon:"🔕",quelle:"— Digitale Hygiene"},
+  {text:"Synergien maximieren, Silos abbauen, Kaffee holen.",icon:"🏗️",quelle:"— Strategiepräsentation, Folie 47"},
+  {text:"Das Projekt ist 90% fertig. Schon seit drei Wochen.",icon:"📏",quelle:"— Softwareentwicklung, universell"},
+  {text:"Work smart, not hard. Und wenn das nicht klappt: work from home.",icon:"🏠",quelle:"— Moderne Arbeitswelt"},
+  {text:"Das Leben ist das, was passiert, während du andere Pläne machst.",icon:"🌊",quelle:"— John Lennon"},
+  {text:"In der Mitte jeder Schwierigkeit liegt eine Möglichkeit.",icon:"🌱",quelle:"— Albert Einstein"},
+  {text:"Man muss das Unmögliche versuchen, um das Mögliche zu erreichen.",icon:"🎯",quelle:"— Hermann Hesse"},
+  {text:"Es kommt nicht darauf an, wie langsam du gehst, solange du nicht aufhörst.",icon:"🐢",quelle:"— Konfuzius"},
+  {text:"Der Pessimist beklagt den Wind. Der Optimist hofft, er ändert sich. Der Realist stellt die Segel.",icon:"⛵",quelle:"— William Arthur Ward"},
+  {text:"Nicht weil es schwer ist, wagen wir es nicht. Weil wir es nicht wagen, ist es schwer.",icon:"🏔️",quelle:"— Seneca"},
+  {text:"Was uns nicht umbringt, macht uns stärker.",icon:"💪",quelle:"— Friedrich Nietzsche"},
+  {text:"Erkenne dich selbst.",icon:"🪞",quelle:"— Sokrates"},
+  {text:"Ich weiß, dass ich nichts weiß.",icon:"🤷",quelle:"— Sokrates"},
+  {text:"Es gibt nichts Gutes, außer man tut es.",icon:"✅",quelle:"— Erich Kästner"},
+  {text:"Wer den Hafen nicht kennt, in den er segeln will, für den ist kein Wind günstig.",icon:"⚓",quelle:"— Seneca"},
+  {text:"Das einzige, was man nicht recyceln kann, ist vergeudete Zeit.",icon:"⏳",quelle:"— Unbekannt"},
+  {text:"Das Leben ist kurz. Lächle, solange du noch Zähne hast.",icon:"😁",quelle:"— Mallory Hopkins"},
+  {text:"Der Klügere gibt nach — deshalb regiert die Dummheit die Welt.",icon:"🌍",quelle:"— Marie von Ebner-Eschenbach"},
+  {text:"Irren ist menschlich. Aber für ein wirkliches Durcheinander braucht man einen Computer.",icon:"💻",quelle:"— Paul Ehrlich"},
+  {text:"Sei die Veränderung, die du in der Welt sehen möchtest.",icon:"🌍",quelle:"— Mahatma Gandhi"},
+  {text:"Haben Sie es schon mal aus- und wieder eingeschaltet?",icon:"🔌",quelle:"— IT-Support, universell"},
+  {text:"Code, der funktioniert, wird nicht angefasst.",icon:"🚫",quelle:"— Erste Regel der Softwarewartung"},
+  {text:"Wenn es funktioniert, weißt du nicht warum. Wenn es nicht funktioniert, erst recht nicht.",icon:"🐛",quelle:"— Programmierhumor"},
+  {text:"Backups macht man, bis man sie wirklich braucht.",icon:"💿",quelle:"— IT-Tragödie"},
+  {text:"Die Cloud ist nur ein anderer Computer, den jemand anderes wartet.",icon:"☁️",quelle:"— Technische Entmystifizierung"},
+  {text:"Wenn du müde bist, lerne auszuruhen, nicht aufzuhören.",icon:"🛌",quelle:"— Banksy"},
+  {text:"Erfolg hat drei Buchstaben: TUN.",icon:"✊",quelle:"— Johann Wolfgang von Goethe"},
+  {text:"Nichts ist so mächtig wie eine Idee, deren Zeit gekommen ist.",icon:"⚡",quelle:"— Victor Hugo"},
+  {text:"Jeder Tag ist eine neue Chance, die Person zu werden, die du sein möchtest.",icon:"🌅",quelle:"— Unbekannt"},
+  {text:"Fortschritt, nicht Perfektion.",icon:"📈",quelle:"— Anonymes Mantra"},
+  {text:"Du musst nicht großartig starten, aber du musst starten, um großartig zu werden.",icon:"🎬",quelle:"— Zig Ziglar"},
+  {text:"Wenn Plan A nicht funktioniert, gibt es noch 25 andere Buchstaben.",icon:"🔤",quelle:"— Optimismus"},
+  {text:"Fehler sind der Beweis, dass du es versuchst.",icon:"🎯",quelle:"— Unbekannt"},
+  {text:"Halte dein Gesicht der Sonne zugewandt, dann fallen die Schatten hinter dich.",icon:"☀️",quelle:"— Walt Whitman"},
+  {text:"Feierabend: Der magische Moment, in dem Stress zu Bier wird.",icon:"🍺",quelle:"— Volksgut"},
+  {text:"Freitag ist der beste Kollege der Woche.",icon:"🥳",quelle:"— Allgemeine Überzeugung"},
+  {text:"Der Feierabend ist die Rache des kleinen Mannes am großen Kalender.",icon:"📅",quelle:"— Bürophilosophie"},
+  {text:"Urlaub: Die Zeit, in der man herausfindet, wie wenig man eigentlich braucht.",icon:"🏝️",quelle:"— Reise-Erkenntnis"},
+  {text:"Samstag ist der einzige Tag, an dem man morgens aufwacht und denkt: Ja.",icon:"👍",quelle:"— Wochendynamik"},
+  {text:"Pünktlich nach Hause gehen ist auch eine Kompetenz.",icon:"🏃",quelle:"— Work-Life-Balance-Coach"},
+  {text:"Wer rastet, der rostet — aber wer nie rastet, brennt aus.",icon:"🔥",quelle:"— Erweitertes Sprichwort"},
+  {text:"Ein guter Plan heute ist besser als ein perfekter Plan morgen.",icon:"📋",quelle:"— George Patton"},
+  {text:"Das Beste ist des Guten Feind.",icon:"⚖️",quelle:"— Voltaire"},
+  {text:"Jedes Ende ist ein neuer Anfang.",icon:"🔄",quelle:"— Universelle Weisheit"},
+  {text:"Wer viel lacht, hat das Leben verstanden.",icon:"😄",quelle:"— Unbekannt"},
+  {text:"Der Mensch braucht zum Glück nicht viel — aber er braucht es regelmäßig.",icon:"🍫",quelle:"— Psychologie des Alltags"},
+  {text:"Dankbarkeit verwandelt das, was wir haben, in genug.",icon:"🙏",quelle:"— Melody Beattie"},
+  {text:"Das Lachen ist der kürzeste Abstand zwischen zwei Menschen.",icon:"😂",quelle:"— Victor Borge"},
+  {text:"Im Zweifel: Kaffee.",icon:"☕",quelle:"— Kollektive Büroweisheit"},
+  {text:"Am Ende des Tages zählt, was du getan hast — nicht was du geplant hattest.",icon:"✅",quelle:"— Pragmatismus"},
+  {text:"Perfektion ist der Feind des Fertigen.",icon:"🚧",quelle:"— Voltaire (adaptiert)"},
+  {text:"Tu es. Oder tu es nicht. Es gibt kein Versuchen.",icon:"🧘",quelle:"— Yoda"},
+  {text:"Der Unterschied zwischen Theorie und Praxis ist in der Praxis größer als in der Theorie.",icon:"📚",quelle:"— Unbekannt"},
+  {text:"Wenn du es eilig hast, mache einen Umweg.",icon:"🐌",quelle:"— Japanisches Sprichwort"},
+  {text:"Wissen ist Macht — aber nur, wenn man es anwendet.",icon:"⚡",quelle:"— Francis Bacon (adaptiert)"},
+  {text:"Jeder Experte war einmal Anfänger.",icon:"🌱",quelle:"— Helen Hayes"},
+  {text:"Das Leben ist zu kurz für schlechten Kaffee.",icon:"☕",quelle:"— Barista-Philosophie"},
+  {text:"Der Weg zur Hölle ist gepflastert mit guten Vorsätzen.",icon:"😈",quelle:"— Samuel Johnson"},
+  {text:"Es reicht nicht zu wollen, man muss auch tun.",icon:"💥",quelle:"— Johann Wolfgang von Goethe"},
+  {text:"Ein freier Kopf ist die beste Vorbereitung auf den nächsten Tag.",icon:"🧘",quelle:"— Achtsamkeitspraxis"},
+  {text:"Zeit, die man genießt zu verschwenden, ist nicht verschwendet.",icon:"🌸",quelle:"— Bertrand Russell"},
+  {text:"Man lebt nur einmal — aber wenn man es richtig macht, reicht das.",icon:"🥂",quelle:"— Mae West"},
+  {text:"Das Leben fängt da an, wo die Komfortzone endet.",icon:"🚪",quelle:"— Neale Donald Walsch"},
+  {text:"Denke groß. Fange klein an. Handle jetzt.",icon:"🚀",quelle:"— Robin Sharma"},
+  {text:"Es gibt keine Misserfolge — nur Lernerfahrungen mit schlechtem Timing.",icon:"📉",quelle:"— Optimisten-Handbuch"},
+  {text:"Ein aufgeräumter Schreibtisch ist das Zeichen eines leeren Geistes.",icon:"🗃️",quelle:"— Albert Einstein (zugeschr.)"},
+  {text:"Wenn alle dasselbe denken, denkt keiner besonders viel.",icon:"🐑",quelle:"— Walter Lippmann"},
+  {text:"Man muss nicht alles verstehen, um es zu respektieren.",icon:"🤝",quelle:"— Toleranzprinzip"},
+  {text:"Es ist besser, grob richtig zu liegen als präzise falsch.",icon:"🎯",quelle:"— John Maynard Keynes"},
+  {text:"Manchmal ist Schweigen die lauteste Antwort.",icon:"🤐",quelle:"— Unbekannt"},
+  {text:"Eine gute Idee hat kein Ablaufdatum.",icon:"💡",quelle:"— Kreativitätsprinzip"},
+  {text:"Das Beste an der Gegenwart ist, dass sie immer da ist.",icon:"🎁",quelle:"— Achtsamkeit"},
+  {text:"Erfolg kommt, wenn Vorbereitung auf Gelegenheit trifft.",icon:"🤞",quelle:"— Seneca (adaptiert)"},
+  {text:"Es gibt immer einen Weg — manchmal muss man ihn nur selbst bauen.",icon:"🛠️",quelle:"— Pragmatismus"},
+  {text:"Das Licht am Ende des Tunnels ist manchmal der Zug.",icon:"🚂",quelle:"— Galgenhumor"},
+  {text:"Humor ist der Knopf, der verhindert, dass uns der Kragen platzt.",icon:"👔",quelle:"— Joachim Ringelnatz"},
+  {text:"Das Beste kommt zum Schluss — deswegen ist Feierabend so schön.",icon:"🌇",quelle:"— Tagesphilosophie"},
+  {text:"Man reist nicht, um anzukommen, sondern um zu reisen.",icon:"🚂",quelle:"— Johann Wolfgang von Goethe"},
+  {text:"Der Anfang ist die Hälfte des Ganzen.",icon:"🏁",quelle:"— Aristoteles"},
+  {text:"Das Leben ist wie Fahrradfahren. Um die Balance zu halten, muss man in Bewegung bleiben.",icon:"🚲",quelle:"— Albert Einstein"},
+  {text:"Nicht jeder, der wandert, ist verloren.",icon:"🧭",quelle:"— J.R.R. Tolkien"},
+  {text:"Gegen die Dummheit kämpfen Götter selbst vergebens.",icon:"⚡",quelle:"— Friedrich Schiller"},
+  {text:"Wer schreibt, der bleibt.",icon:"✍️",quelle:"— Lateinisches Sprichwort"},
+  {text:"Wenn der Wind des Wandels weht, bauen die einen Mauern, die anderen Windmühlen.",icon:"🌬️",quelle:"— Chinesisches Sprichwort"},
+  {text:"Wer zu spät kommt, den bestraft das Leben — wer zu früh kommt, wartet.",icon:"⏱️",quelle:"— Zeitmanagement-Realität"},
+  {text:"Wer sich keine Zeit zum Ausruhen nimmt, wird sich Zeit zum Kranksein nehmen müssen.",icon:"🏥",quelle:"— Medizinische Volksweisheit"},
+  {text:"Kleine Schritte jeden Tag führen zu großen Ergebnissen.",icon:"👣",quelle:"— Kaizen"},
+  {text:"Wer fragt, führt.",icon:"❓",quelle:"— Coaching-Prinzip"},
+  {text:"Verändere, was du ändern kannst. Akzeptiere, was du nicht ändern kannst. Wisse den Unterschied.",icon:"☮️",quelle:"— Reinhold Niebuhr"},
+  {text:"Wer lacht, lebt länger — und nervt seine Kollegen effektiver.",icon:"😄",quelle:"— Büroerkenntnis"},
+  {text:"Ein gutes Leben ist das beste Gegenmittel gegen einen schlechten Tag.",icon:"🌟",quelle:"— Unbekannt"},
+  {text:"Wer die Wahl hat, hat die Qual — und meistens auch eine Meinung.",icon:"🤔",quelle:"— Erweitertes Sprichwort"},
+  {text:"Ohne Fleiß kein Preis — aber mit zu viel Fleiß auch kein Leben.",icon:"⚖️",quelle:"— Balance-Weisheit"},
+  {text:"Was zählt, ist nicht die Anzahl der Atemzüge, sondern die Momente, die uns den Atem verschlagen.",icon:"💫",quelle:"— Unbekannt"},
+  {text:"Das Leben ist kein Wunschkonzert — aber man kann die Playlist beeinflussen.",icon:"🎵",quelle:"— Moderne Lebensphilosophie"},
+  {text:"Wer lächelt statt zu toben, hat die Oberhand.",icon:"😏",quelle:"— Laurence J. Peter"},
+  {text:"Das Leben beginnt am Ende deiner Komfortzone.",icon:"🌊",quelle:"— Neale Donald Walsch"},
+  {text:"Wer anderen das Beste gönnt, dem gönnt das Leben das Beste zurück.",icon:"🔄",quelle:"— Volksweisheit"},
+  {text:"Die Zufriedenheit liegt nicht im Erreichen des Ziels, sondern im Streben danach.",icon:"🏹",quelle:"— Leo Tolstoi"},
+  {text:"Routine ist der Feind der Zeit — und manchmal ihr bester Freund.",icon:"🔁",quelle:"— Paradox des Alltags"},
+  {text:"Das Geheimnis liegt nicht darin, was man tut, sondern wie man es tut.",icon:"🎨",quelle:"— Unbekannt"},
+  {text:"Fehler zu wiederholen nennt man Erfahrung sammeln. Fehler nicht zu wiederholen nennt man Weisheit.",icon:"🦉",quelle:"— Volksweisheit"},
+  {text:"Der Unterschied zwischen einem schlechten und einem guten Tag liegt oft an der ersten Stunde.",icon:"🌄",quelle:"— Morgenroutine-Philosophie"},
+  {text:"Schlaf ist die beste Meditation.",icon:"😴",quelle:"— Dalai Lama"},
+  {text:"Ein Nickerchen am Mittag kostet nichts und bringt viel.",icon:"😪",quelle:"— Winston Churchill (Praktiker)"},
+  {text:"Zeit ist Geld. Deswegen sollten Meetings kürzer sein.",icon:"💰",quelle:"— Jeder CFO"},
+  {text:"Eine E-Mail ist kein Beweis, dass jemand die Information gelesen hat.",icon:"📨",quelle:"— Empirische Büroforschung"},
+  {text:"Stress ist nichts anderes als das Gefühl, keine Kontrolle zu haben.",icon:"😤",quelle:"— Hans Selye (adaptiert)"},
+  {text:"Manchmal ist Nichtstun die produktivste Entscheidung des Tages.",icon:"🛀",quelle:"— Moderne Achtsamkeitslehre"},
+  {text:"Eine gute Frage ist wertvoller als eine schlechte Antwort.",icon:"❓",quelle:"— Socratische Tradition"},
+  {text:"Niemand ist bei der Arbeit so beschäftigt wie jemand, der eine lange To-do-Liste schreibt.",icon:"📝",quelle:"— Produktivitätsforschung"},
+  {text:"Ich habe alles unter Kontrolle. Nur nicht meinen Posteingang.",icon:"📬",quelle:"— Jeder"},
+  {text:"Das wahre Talent liegt darin, die Arbeit zu erledigen, ohne von ihr erledigt zu werden.",icon:"🤸",quelle:"— Büroweisheit"},
+  {text:"Die Kunst besteht darin, zu wissen, welche Aufgaben man ignorieren kann.",icon:"🎩",quelle:"— Peter Drucker (adaptiert)"},
+  {text:"Das Beste an einem Fehler ist, dass man danach schlauer ist — theoretisch.",icon:"🎓",quelle:"— Optimistische Sichtweise"},
+  {text:"Wer viel fragt, geht zwar viel, aber manchmal auch im Kreis.",icon:"🔁",quelle:"— Deutsches Sprichwort"},
+  {text:"Das Risiko eines falschen Entscheids ist geringer als die Lähmung durch Unentschlossenheit.",icon:"🎲",quelle:"— John D. Rockefeller"},
+  {text:"Ich habe meinen Kalender geöffnet und direkt wieder geschlossen.",icon:"📆",quelle:"— Montag, 8 Uhr"},
+  {text:"Wir müssen das Rad nicht neu erfinden. Wir müssen es nur dokumentieren.",icon:"📖",quelle:"— Qualitätssicherung"},
+  {text:"Alles was getan werden kann, kann auch besser gemacht werden.",icon:"⬆️",quelle:"— Kaizen-Philosophie"},
+  {text:"Manchmal muss man innehalten, um zu verstehen, wohin man läuft.",icon:"⏸️",quelle:"— Achtsamkeitsweisheit"},
+  {text:"Ein Bild sagt mehr als tausend Worte. Eine Tabelle sagt mehr als tausend Bilder.",icon:"📊",quelle:"— Datenanalyse-Kultur"},
+  {text:"Das Wichtigste im Leben ist, zu wissen, was das Wichtigste ist.",icon:"🌟",quelle:"— Konfuzius (adaptiert)"},
+  {text:"Komplizierte Probleme haben einfache, leicht verständliche, falsche Antworten.",icon:"🎯",quelle:"— H. L. Mencken"},
+  {text:"Manchmal muss man hinter sich schauen, um zu wissen, wohin man geht.",icon:"🔭",quelle:"— Reflexion"},
+  {text:"Ein Lächeln kostet nichts und bringt viel.",icon:"😊",quelle:"— Dale Carnegie (adaptiert)"},
+  {text:"Manche Leute träumen vom Erfolg, andere wachen auf und arbeiten daran.",icon:"⏰",quelle:"— Unbekannt"},
+  {text:"Du wirst nicht jede Welle reiten, aber du kannst lernen, im Wasser zu bleiben.",icon:"🏄",quelle:"— Surfer-Philosophie"},
+  {text:"Die Weisheit eines Mannes misst man nicht an seiner Erfahrung, sondern an seiner Fähigkeit, Erfahrungen zu machen.",icon:"🌀",quelle:"— George Bernard Shaw"},
+  {text:"Alles Große in der Welt ist von leidenschaftlichen Menschen vollbracht worden.",icon:"🔥",quelle:"— Georg Wilhelm Friedrich Hegel"},
+  {text:"Wer kämpft, kann verlieren. Wer nicht kämpft, hat schon verloren.",icon:"⚔️",quelle:"— Bertolt Brecht"},
+  {text:"Aller Anfang ist schwer.",icon:"🌊",quelle:"— Deutsches Sprichwort"},
+  {text:"Das Gras ist immer grüner auf der anderen Seite — bis man dort angekommen ist.",icon:"🌿",quelle:"— Unbekannt"},
+  {text:"Reden ist Silber, Schweigen ist Gold — im Meeting oft umgekehrt.",icon:"🤫",quelle:"— Büro-Edition"},
+  {text:"Das Wichtigste ist nicht das Ziel, sondern der Weg — außer bei der Steuererklärung.",icon:"🗺️",quelle:"— Pragmatische Lebensweisheit"},
+  {text:"Wer die Wahrheit sagt, braucht ein schnelles Pferd.",icon:"🐎",quelle:"— Chinesisches Sprichwort"},
+  {text:"Der Mensch denkt, Gott lenkt — und die IT-Abteilung unterbricht.",icon:"🖥️",quelle:"— Moderne Theologie"},
+  {text:"Automatisierung bedeutet, dass jetzt Computer die Fehler machen.",icon:"🤖",quelle:"— Fortschrittsparadoxon"},
+  {text:"Das beste Interface ist keins — aber das zweitbeste ist eines, das niemand erklärt werden muss.",icon:"🖱️",quelle:"— UX-Philosophie"},
+  {text:"Urgency is the enemy of importance.",icon:"🔥",quelle:"— Dwight D. Eisenhower"},
+  {text:"Ich habe keine Zeit zum Planen — ich bin zu beschäftigt damit, Brände zu löschen.",icon:"🚒",quelle:"— Jede Abteilung"},
+  {text:"Eine Präsentation ohne Animationen ist wie ein Meeting ohne Kekse.",icon:"🍪",quelle:"— Kreativabteilung"},
+  {text:"Das größte Performance-Problem sitzt vor dem Bildschirm.",icon:"🪑",quelle:"— Systemadministratoren-Weisheit"},
+  {text:"Ein Kommentar im Code ist wie ein Liebesbrief an dein zukünftiges Ich.",icon:"💌",quelle:"— Entwicklerkultur"},
+  {text:"Wer morgens lacht, lacht am besten.",icon:"😂",quelle:"— Optimisten"},
+  {text:"Tue jeden Tag etwas, das dich etwas kostet.",icon:"💸",quelle:"— Eleanor Roosevelt (adaptiert)"},
+  {text:"Man soll dem Glück nicht in die Parade fahren.",icon:"🎺",quelle:"— Deutsches Sprichwort"},
+  {text:"Halte die Augen offen und den Mund geschlossen — du wirst viel lernen.",icon:"👀",quelle:"— Altes Sprichwort"},
+  {text:"Wer sich selbst kennt, kennt seinen Feind.",icon:"🪞",quelle:"— Sun Tzu (adaptiert)"},
+  {text:"Die Dinge sind nicht, wie sie sind. Sie sind, wie wir sie sehen.",icon:"👓",quelle:"— Marcel Proust"},
+  {text:"Das Geheimnis des Erfolgs ist, den Standpunkt des anderen zu verstehen.",icon:"👥",quelle:"— Henry Ford"},
+  {text:"Bescheidenheit ist eine Tugend — solange man nicht zu bescheiden ist, um sie zu zeigen.",icon:"🎭",quelle:"— Satirische Weisheit"},
+  {text:"Man muss das Leben so nehmen, wie es kommt — aber versuchen, es zu gestalten.",icon:"🌀",quelle:"— Carl Friedrich von Weizsäcker"},
+  {text:"Wer anderen eine Grube gräbt, braucht einen Bagger.",icon:"🚜",quelle:"— Aktualisiertes Sprichwort"},
+  {text:"Im Zweifel für den Angeklagten — bei Deadlines eher nicht.",icon:"⚖️",quelle:"— Rechtsprinzip im Bürokontext"},
+  {text:"Zu früh alt, zu spät klug.",icon:"👴",quelle:"— Deutsches Sprichwort"},
+  {text:"Der Mensch ist des Menschen größte Ressource — und größte Zeitverschwendung.",icon:"👤",quelle:"— HR-Paradoxon"},
+  {text:"Das Büro ist der einzige Ort, wo Kaffee als Grundnahrungsmittel gilt.",icon:"☕",quelle:"— Ernährungswissenschaft light"},
+  {text:"Wer zu viele Eisen im Feuer hat, verbrennt sich die Finger.",icon:"🔥",quelle:"— Fokus-Prinzip"},
+  {text:"Delegation ist die Kunst, anderen die Arbeit zu geben und die Lorbeeren zu behalten.",icon:"🏅",quelle:"— Zynische Führungslehre"},
+  {text:"Die meisten Probleme lösen sich von selbst — man muss nur warten.",icon:"⏳",quelle:"— Erfahrener Manager"},
+  {text:"Vertrauen ist gut. Nachfragen ist besser.",icon:"🔍",quelle:"— Pragmatisches Prinzip"},
+  {text:"Wer immer tut, was er kann, wird nie mehr können, als er tut.",icon:"📐",quelle:"— Entwicklungsparadoxon"},
+  {text:"Ein weiser Mann spricht, weil er etwas zu sagen hat. Ein Narr, weil er etwas sagen muss.",icon:"🦜",quelle:"— Platon"},
+  {text:"Das Schweigen des Kollegen ist manchmal lauter als sein Reden.",icon:"🤫",quelle:"— Bürodiagnostik"},
+  {text:"Wer viel verspricht, hält wenig. Wer wenig verspricht, überrascht angenehm.",icon:"🎁",quelle:"— Erwartungsmanagement"},
+  {text:"Arbeit adelt — Feierabend adelt mehr.",icon:"👑",quelle:"— Überarbeitetes Adelsrecht"},
+  {text:"Das Leben ist ein Marathon, kein Sprint. Außer am Freitagnachmittag.",icon:"🏃",quelle:"— Wochendynamik"},
+  {text:"Wer sich nicht bewegt, spürt seine Ketten nicht.",icon:"🧲",quelle:"— Rosa Luxemburg"},
+  {text:"Erfahrung ist der beste Lehrer — und der teuerste.",icon:"🎓",quelle:"— Thomas Carlyle"},
+  {text:"Zwischen dem, was man denkt, sagt, meint und tut, gibt es viel Spielraum für Missverständnisse.",icon:"🎭",quelle:"— Kommunikationsforschung"},
+  {text:"Wer lesen kann, ist klar im Vorteil — vor allem bei E-Mails.",icon:"📩",quelle:"— Digitale Alphabetisierung"},
+  {text:"Komplexität ist der Feind der Zuverlässigkeit.",icon:"⚙️",quelle:"— Ingenieursprinzip"},
+  {text:"Das Beste an Montagmorgen ist der Dienstag.",icon:"📅",quelle:"— Realists Weekly"},
+  {text:"Wissen ist der einzige Rohstoff, der beim Gebrauch nicht verbraucht wird.",icon:"📚",quelle:"— Bildungsphilosophie"},
+  {text:"Ein Tag ohne Lachen ist ein verlorener Tag.",icon:"😄",quelle:"— Charlie Chaplin"},
+  {text:"Wer die Vergangenheit nicht kennt, ist verdammt, sie zu wiederholen.",icon:"🔄",quelle:"— George Santayana"},
+  {text:"Manchmal ist der kürzeste Weg zwischen zwei Punkten eine Umgehungsstraße.",icon:"🛣️",quelle:"— Projektmanagement-Realität"},
+  {text:"Die schönsten Stunden vergehen am schnellsten.",icon:"⏰",quelle:"— Subjektive Zeitwahrnehmung"},
+  {text:"Ordnung ist das halbe Leben — die andere Hälfte ist Chaos.",icon:"🌀",quelle:"— Realistisches Sprichwort"},
+  {text:"Nur wer sein Ziel kennt, findet den Weg.",icon:"🗺️",quelle:"— Laozi"},
+  {text:"Der Unterschied zwischen Können und Tun ist oft nur der erste Schritt.",icon:"👣",quelle:"— Motivationsforschung"},
+  {text:"Das Glück ist kein Zufall.",icon:"🍀",quelle:"— Seneca (adaptiert)"},
+  {text:"Wer einmal lügt, dem glaubt man nicht — auch wenn er die Wahrheit spricht.",icon:"🤥",quelle:"— Deutsches Sprichwort"},
+  {text:"Es ist besser, einen Freund zu haben als tausend Bekannte.",icon:"🤗",quelle:"— Volksweisheit"},
+  {text:"Das Leben ist kein Ponyhof — aber es gibt Momente, die sich so anfühlen.",icon:"🐴",quelle:"— Optimistische Realistik"},
+  {text:"Wer nichts riskiert, riskiert am meisten.",icon:"🎲",quelle:"— Erica Jong"},
+  {text:"Fang an zu sein, wer du sein willst.",icon:"🌱",quelle:"— Unbekannt"},
+  {text:"Die Erde ist die Wiege der Menschheit, aber niemand verbringt sein Leben in einer Wiege.",icon:"🚀",quelle:"— Konstantin Tsiolkowski"},
+  {text:"Kreativität braucht Mut.",icon:"🦁",quelle:"— Henri Matisse"},
+  {text:"Was du heute kannst besorgen, das verschiebe nicht auf morgen — es sei denn, der Kalender ist schon voll.",icon:"📅",quelle:"— Realistisches Sprichwort"},
+  {text:"Das Beste an schlechten Erfahrungen: Man macht sie meistens nur einmal.",icon:"🎓",quelle:"— Optimistische Lebenssicht"},
+  {text:"Wer den Schaden hat, braucht für den Spott nicht zu sorgen.",icon:"😅",quelle:"— Deutsches Sprichwort"},
+  {text:"Im Leben gibt es keine Probleme, nur Herausforderungen — und manchmal beides gleichzeitig.",icon:"🧗",quelle:"— Coaching-Kultur"},
+  {text:"Die beste Investition ist die in sich selbst.",icon:"💰",quelle:"— Warren Buffett"},
+  {text:"Was lange währt, wird endlich gut — manchmal.",icon:"⌛",quelle:"— Relativiertes Sprichwort"},
+  {text:"Neid ist die aufrichtigste Form der Anerkennung.",icon:"👀",quelle:"— Wilhelm Busch"},
+  {text:"Das Beste am Montag ist, dass er nur einmal pro Woche kommt.",icon:"📅",quelle:"— Wochenstruktur-Analyse"},
+  {text:"Am Ende bereut man nicht die Dinge, die man getan hat, sondern die, die man nicht getan hat.",icon:"💭",quelle:"— Mark Twain"},
+  {text:"Jeder Mensch hat einen guten und einen schlechten Tag — manchmal gleichzeitig.",icon:"🌗",quelle:"— Psychologie des Alltags"},
+  {text:"Wer gut anfängt, hat halb gewonnen.",icon:"🏁",quelle:"— Aristoteles (adaptiert)"},
+  {text:"Das Lächeln ist die kürzeste Verbindung zwischen zwei Menschen.",icon:"😊",quelle:"— Unbekannt"},
+  {text:"Wer den ganzen Tag arbeitet, hat keine Zeit, Geld zu verdienen.",icon:"💸",quelle:"— John D. Rockefeller"},
+  {text:"Träume nicht dein Leben, lebe deinen Traum.",icon:"💭",quelle:"— Unbekannt"},
+  {text:"Das Wichtigste ist nicht das, was uns passiert, sondern wie wir darauf reagieren.",icon:"🧘",quelle:"— Epiktet"},
+  {text:"Wer gibt, was er hat, ist würdig zu empfangen, was er braucht.",icon:"🤲",quelle:"— Brasilianisches Sprichwort"},
+  {text:"Hab keine Angst, langsam zu sein. Hab Angst, stillzustehen.",icon:"🐢",quelle:"— Chinesisches Sprichwort"},
+  {text:"Das Leben ist wie ein Fahrrad. Wenn du aufhörst zu treten, fällst du hin.",icon:"🚲",quelle:"— Claude Pepper"},
+  {text:"Mut ist nicht die Abwesenheit von Angst, sondern das Urteil, dass etwas anderes wichtiger ist.",icon:"🦁",quelle:"— Ambrose Redmoon"},
+  {text:"Wer die Arbeit liebt, muss sie nicht fliehen.",icon:"💼",quelle:"— Arbeitsphilosophie"},
+  {text:"Die schwerste Arbeit ist oft die Arbeit am eigenen Charakter.",icon:"⚒️",quelle:"— Volksweisheit"},
+  {text:"Das beste Meeting ist das, das nicht stattfinden musste.",icon:"🚫",quelle:"— Effizienzerkenntnis"},
+  {text:"Wer gut schläft, arbeitet besser. Wer gut arbeitet, schläft besser. Wer gut schläft und gut arbeitet, braucht keinen Rat.",icon:"😴",quelle:"— Schlafforschung light"},
+  {text:"Zwischen Wollen und Können liegt meistens das Tun.",icon:"🛠️",quelle:"— Pragmatismus"},
+  {text:"Ein guter Kollege ist besser als jede KI.",icon:"🤝",quelle:"— Kollegialitätsprinzip"},
+  {text:"Wer einmal ja sagt, sagt immer ja. Lerne nein zu sagen.",icon:"🚫",quelle:"— Grenzen setzen"},
+  {text:"Kein Rückenwind ohne Gegenwind.",icon:"🌬️",quelle:"— Segler-Weisheit"},
+  {text:"Das Wichtigste ist unsichtbar — außer in der Buchhaltung.",icon:"📒",quelle:"— Frei nach Saint-Exupéry"},
+  {text:"Wer nicht plant, plant zu scheitern.",icon:"📋",quelle:"— Benjamin Franklin"},
+  {text:"Selbst der längste Weg beginnt mit dem ersten Schritt.",icon:"👣",quelle:"— Laozi"},
+  {text:"Das Leben ist ein Experiment. Das Schöne: Du darfst es jeden Tag wiederholen.",icon:"🔬",quelle:"— Wissenschaftliche Lebensphilosophie"},
+  {text:"Manchmal ist die beste Strategie, einfach loszulegen.",icon:"🚦",quelle:"— Bias for Action"},
+  {text:"Wer zu viel nachdenkt, handelt zu wenig.",icon:"💭",quelle:"— Handlungsprinzip"},
+  {text:"Ein guter Plan ist wie ein Schirm: Man braucht ihn am meisten, wenn man ihn nicht dabei hat.",icon:"☂️",quelle:"— Murphy's Bürogesetz"},
+  {text:"Das Beste an Problemen ist, dass sie meistens eine Lösung haben.",icon:"🔓",quelle:"— Optimismus"},
+  {text:"Wer fragt, bleibt nicht stecken.",icon:"❓",quelle:"— Lernprinzip"},
+  {text:"Arbeit ohne Pause macht unproduktiv.",icon:"⏸️",quelle:"— Kognitionswissenschaft"},
+  {text:"Das Büro ist der beste Ort, um Menschen zu beobachten — und der schlechteste, um sie zu verstehen.",icon:"🔭",quelle:"— Soziologie des Alltags"},
+  {text:"Wer alles selbst macht, macht am Ende gar nichts mehr.",icon:"🤹",quelle:"— Delegationsprinzip"},
+  {text:"Zeit ist das einzige Kapital, das jeder gleich viel besitzt.",icon:"⏰",quelle:"— Unbekannt"},
+  {text:"Manchmal ist der beste Rat: Warte ab.",icon:"⌛",quelle:"— Erfahrene Gelassenheit"},
+  {text:"Neugier ist der Motor des Fortschritts.",icon:"🔍",quelle:"— Wissenschaftsethos"},
+  {text:"Wer zuhört, lernt mehr als wer redet.",icon:"👂",quelle:"— Kommunikationsweisheit"},
+  {text:"Der beste Ausweg ist immer durch.",icon:"🚪",quelle:"— Robert Frost"},
+  {text:"Wer lächelt, wenn die Dinge schiefgehen, hat jemanden gefunden, dem er die Schuld geben kann.",icon:"😅",quelle:"— Bürohumor"},
+  {text:"Es ist nicht wichtig, was du hast. Es ist wichtig, was du damit machst.",icon:"🎯",quelle:"— Ressourcenprinzip"},
+  {text:"Kein Mensch ist eine Insel.",icon:"🏝️",quelle:"— John Donne"},
+  {text:"Das Beste an der Nacht ist der Morgen danach.",icon:"🌅",quelle:"— Nachteulen-Trost"},
+  {text:"Wer zuerst kommt, mahlt zuerst — aber wer am klügsten fragt, mahlt am besten.",icon:"🌾",quelle:"— Aktualisiertes Sprichwort"},
+  {text:"Übung macht den Meister — aber der Meister hört nie auf zu üben.",icon:"🎸",quelle:"— Handwerksphilosophie"},
+  {text:"Wer den ganzen Wald vor lauter Bäumen nicht sieht, braucht eine Pause.",icon:"🌲",quelle:"— Perspektivwechsel"},
+  {text:"Die einfachsten Fragen sind oft die schwierigsten.",icon:"❓",quelle:"— Sokrates (adaptiert)"},
+  {text:"Wissen, was man nicht weiß, ist der Beginn der Weisheit.",icon:"📖",quelle:"— Konfuzius"},
+  {text:"Ein gutes Gespräch ist besser als jede Therapie — und billiger.",icon:"💬",quelle:"— Volkspsychologie"},
+  {text:"Wer das Einfache beherrscht, beherrscht das Komplexe.",icon:"🧩",quelle:"— Grundlagenprinzip"},
+  {text:"Der beste Humor wächst auf dem Boden der Selbsterkenntnis.",icon:"😂",quelle:"— Humorforschung"},
+  {text:"Manchmal muss man einen Schritt zurücktreten, um zwei voranzukommen.",icon:"↩️",quelle:"— Strategisches Denken"},
+  {text:"Wer Verantwortung übernimmt, gewinnt Freiheit.",icon:"🦅",quelle:"— Leadership-Prinzip"},
+  {text:"Das Beste an einem langen Tag ist das Ende.",icon:"🌙",quelle:"— Ehrliche Tagesphilosophie"},
+  {text:"Wer nicht scheitert, lernt nicht.",icon:"📉",quelle:"— Silicon Valley (adaptiert)"},
+  {text:"Die beste Idee nützt nichts ohne Umsetzung.",icon:"⚙️",quelle:"— Unternehmerweisheit"},
+  {text:"Vertrauen braucht Jahre zum Aufbau und Sekunden zum Zerstören.",icon:"🏗️",quelle:"— Beziehungsweisheit"},
+  {text:"Wer nichts hinterfragt, ändert nichts.",icon:"🔍",quelle:"— Innovationsprinzip"},
+  {text:"Das Beste am Scheitern ist, dass man danach weiß, was nicht funktioniert.",icon:"🧪",quelle:"— Thomas Edison (adaptiert)"},
+  {text:"Wer eine Stunde lang liest, lernt mehr als wer einen Tag lang redet.",icon:"📚",quelle:"— Bildungsprinzip"},
+  {text:"Manchmal ist die Antwort nicht das, was du hören wolltest — aber das, was du brauchtest.",icon:"💡",quelle:"— Lebenscoaching"},
+  {text:"Wer die Welt verbessern will, fängt bei sich selbst an.",icon:"🌍",quelle:"— Mahatma Gandhi (adaptiert)"},
+  {text:"Der Feind des Guten ist nicht das Schlechte, sondern das Bessere.",icon:"⬆️",quelle:"— Qualitätsprinzip"},
+  {text:"Wer aufgibt, verliert garantiert.",icon:"🏳️",quelle:"— Durchhalte-Prinzip"},
+  {text:"Die größte Entdeckung ist, dass ein Mensch sein Leben verändern kann, indem er seine Einstellung ändert.",icon:"🔄",quelle:"— William James"},
+  {text:"Wer immer geradeaus geht, verpasst die schönsten Abzweigungen.",icon:"🛤️",quelle:"— Lebensreise-Metapher"},
+  {text:"Das Schweigen ist oft die klügste Antwort — aber schwer zu dokumentieren.",icon:"📝",quelle:"— Büropragmatismus"},
+  {text:"Wer lacht, hat verstanden.",icon:"😄",quelle:"— Goethe (zugeschr.)"},
+  {text:"Ein leerer Magen ist kein guter Ratgeber.",icon:"🍽️",quelle:"— Deutsches Sprichwort"},
+  {text:"Manchmal ist die produktivste Sache, die man tun kann, spazieren zu gehen.",icon:"🚶",quelle:"— Steve Jobs (bekannt für Gehmeeetings)"},
+  {text:"Wer zu lange wartet, wartet vergebens.",icon:"⏳",quelle:"— Entscheidungsprinzip"},
+  {text:"Die meisten guten Dinge brauchen Zeit.",icon:"🌱",quelle:"— Gedulds-Prinzip"},
+  {text:"Wer die kleinen Dinge nicht schätzt, verdient die großen nicht.",icon:"🔎",quelle:"— Dankbarkeitsprinzip"},
+  {text:"Das Büroleben ist wie ein Schachspiel: Man muss immer mehrere Züge voraus denken.",icon:"♟️",quelle:"— Strategiemetapher"},
+  {text:"Wer immer nur nickt, hat bald einen steifen Hals.",icon:"🙈",quelle:"— Meinungsfreiheits-Sprichwort"},
+  {text:"Die Lösung eines Problems schafft oft neue Probleme.",icon:"🔁",quelle:"— Systemdenken"},
+  {text:"Wer zu viel möchte, bekommt am Ende wenig.",icon:"🎯",quelle:"— Fokus-Prinzip"},
+  {text:"Der Zug ist abgefahren — aber der nächste kommt.",icon:"🚂",quelle:"— Zuversicht"},
+  {text:"Manchmal sind die besten Entscheidungen die, die man nicht trifft.",icon:"⚖️",quelle:"— Entscheidungsforschung"},
+  {text:"Wer heute sät, erntet morgen — es sei denn, es regnet die ganze Zeit.",icon:"🌧️",quelle:"— Realistisches Sprichwort"},
+  {text:"Das Beste an der Arbeit sind die Momente, in denen man vergisst zu arbeiten.",icon:"💫",quelle:"— Flow-Erfahrung"},
+  {text:"Wer zu gut plant, verpasst das Leben.",icon:"📅",quelle:"— Spontanitätsprinzip"},
+  {text:"Es braucht keine perfekte Situation — es braucht deinen Entschluss.",icon:"💪",quelle:"— Stoische Philosophie"},
+  {text:"Wer den Mut hat anzufangen, hat die halbe Miete.",icon:"🏠",quelle:"— Motivationsprinzip"},
+  {text:"Manchmal ist weniger mehr — besonders in CC-Feldern.",icon:"📧",quelle:"— E-Mail-Effizienz"},
+  {text:"Wer morgens gut beginnt, endet abends gut.",icon:"🌄",quelle:"— Morgenroutine"},
+  {text:"Das Leben ist zu wertvoll, um es mit unnötigen Meetings zu verschwenden.",icon:"⏰",quelle:"— Lebensqualitäts-Manifest"},
+  {text:"Wer zweifelt, fragt. Wer fragt, lernt. Wer lernt, wächst.",icon:"🌱",quelle:"— Bildungskette"},
+  {text:"Der beste Kollege ist der, der da ist, wenn man ihn braucht — und weg, wenn man Ruhe braucht.",icon:"👤",quelle:"— Kollegialitätsideal"},
+  {text:"Manchmal ist das Ziel nicht das Ziel, sondern der Weg dorthin.",icon:"🗺️",quelle:"— Prozessphilosophie"},
+  {text:"Wer immer nur Vollgas gibt, läuft irgendwann leer.",icon:"⛽",quelle:"— Burnout-Prävention"},
+  {text:"Das Leben ist zu kurz für schlechte Laune am Freitag.",icon:"😎",quelle:"— TGIF-Philosophie"},
+  {text:"Wer sich selbst treu bleibt, braucht keine Maske.",icon:"🎭",quelle:"— Authentizitätsprinzip"},
+  {text:"Ein Feierabend ohne Plan ist der beste Plan.",icon:"🌅",quelle:"— Spontanitäts-Ode"},
+  {text:"Wer viel arbeitet, sollte auch viel feiern.",icon:"🎉",quelle:"— Work-Life-Balance"},
+  {text:"Das Beste am Ende des Tages ist der Blick zurück — und dann das Abschalten.",icon:"💤",quelle:"— Abschaltritual"},
+  {text:"Manchmal ist der mutigste Satz: Ich brauche Hilfe.",icon:"🙋",quelle:"— Verletzlichkeit als Stärke"},
+  {text:"Wer loslässt, gewinnt Raum für Neues.",icon:"🌬️",quelle:"— Minimalismus-Prinzip"},
+  {text:"Das Feierabend-Bier schmeckt am besten nach einem langen Tag.",icon:"🍺",quelle:"— Biologie der Belohnung"},
+  {text:"Wer gut isst und gut schläft, hat die halbe Gesundheit.",icon:"🥗",quelle:"— Volksmedizin"},
+  {text:"Manchmal ist das Beste, was du für andere tun kannst, für dich selbst zu sorgen.",icon:"🫀",quelle:"— Selbstfürsorge"},
+  {text:"Wer die Arbeit liebt, liebt das Leben.",icon:"💚",quelle:"— Arbeitsphilosophie"},
+  {text:"Der Tag endet. Der Feierabend beginnt. Alles gut.",icon:"🌙",quelle:"— Feierabend-Mantra"},
+  {text:"Wer aufmerksam ist, lernt überall.",icon:"👀",quelle:"— Leonardo da Vinci (adaptiert)"},
+  {text:"Das Leben gibt jedem die gleiche Zeit — aber nicht die gleiche Weisheit damit umzugehen.",icon:"⏳",quelle:"— Unbekannt"},
+  {text:"Wer heute lacht, hat gestern gut gearbeitet.",icon:"😄",quelle:"— Belohnungsprinzip"},
+  {text:"Manchmal braucht es nur einen guten Satz, um den Tag zu retten.",icon:"💬",quelle:"— Sprachphilosophie"},
+  {text:"Das Wochenende gehört dir — nutze es weise oder gar nicht.",icon:"🛋️",quelle:"— Erholungsphilosophie"},
+  {text:"Wer sich freut, hat recht.",icon:"🎊",quelle:"— Wilhelm Busch"},
+];
+const GETRAENKE = ["🍺","🍻","🥂","🍷","🍸","🍹","🥃","🍾","🧉","🫗","🍵","🎂"];
+
+const today = new Date(); const dayIndex = (today.getFullYear()*10000 + (today.getMonth()+1)*100 + today.getDate()) % WEISHEITEN.length;
+const w = WEISHEITEN[dayIndex];
+document.getElementById('wisdom-text').textContent   = w.text;
+document.getElementById('wisdom-icon').textContent   = w.icon;
+document.getElementById('wisdom-source').textContent = w.quelle;
+const d  = GETRAENKE[Math.floor(Math.random() * GETRAENKE.length)];
+document.getElementById('drink-emoji').textContent   = d;
+const dw = GETRAENKE[Math.floor(Math.random() * GETRAENKE.length)];
+document.getElementById('drink-emoji-we').textContent = dw + dw + dw;
+
+// Settings
+const savedStart = localStorage.getItem('feierabend_start') || '07:30';
+const savedEnd   = localStorage.getItem('feierabend_end')   || '16:00';
+document.getElementById('input-start').value = savedStart;
+document.getElementById('input-end').value   = savedEnd;
+document.getElementById('input-start').addEventListener('change', function(){
+  localStorage.setItem('feierabend_start', this.value);
 });
-// F5 / Ctrl+R abfangen und Modal zeigen
-document.addEventListener('keydown',function(e){
-  if(e.key==='F5'||(e.ctrlKey&&e.key==='r')||(e.metaKey&&e.key==='r')){
-    if(getEntries().length>0){
-      e.preventDefault();
-      document.getElementById('reloadModal').classList.add('show');
+document.getElementById('input-end').addEventListener('change', function(){
+  localStorage.setItem('feierabend_end', this.value);
+});
+function toggleSettings() {
+  document.getElementById('settings-body').classList.toggle('hidden');
+  document.getElementById('toggle-btn').classList.toggle('open');
+}
+
+// Sonnendaten
+const LAT = 47.593, LNG = 7.621;
+let sunriseMin = 6*60, sunsetMin = 20*60, sunDataDate = '';
+async function fetchSunTimes() {
+  const today = new Date().toISOString().slice(0,10);
+  if (sunDataDate === today) return;
+  try {
+    const res  = await fetch('https://api.sunrise-sunset.org/json?lat='+LAT+'&lng='+LNG+'&formatted=0&date='+today);
+    const data = await res.json();
+    if (data.status === 'OK') {
+      const toLocalMin = function(iso){ const d = new Date(iso); return d.getHours()*60 + d.getMinutes(); };
+      sunriseMin  = toLocalMin(data.results.sunrise);
+      sunsetMin   = toLocalMin(data.results.sunset);
+      sunDataDate = today;
     }
-  }
-});
-function closeModal(){document.getElementById('reloadModal').classList.remove('show');}
-function confirmReload(){allowReload=true;location.reload();}
-
-/* ── State ──────────────────────────────────────────────────── */
-var currentDate=todayStr();
-var allData=loadData();
-var bisAuto=true;
-
-function todayStr(){return new Date().toISOString().slice(0,10);}
-function loadData(){try{return JSON.parse(localStorage.getItem('g_zt')||'{}');}catch(e){return {};}}
-function saveData(){localStorage.setItem('g_zt',JSON.stringify(allData));}
-function getEntries(){return allData[currentDate]||[];}
-function setEntries(e){allData[currentDate]=e;saveData();}
-
-/* ── Date ───────────────────────────────────────────────────── */
-function pad(n){return String(n).padStart(2,'0');}
-function dateDE(str){
-  var d=new Date(str+'T00:00:00');
-  return ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+', '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
+  } catch(e) {}
 }
-var _navBusy=false;
-function navDay(delta){
-  if(_navBusy)return;
-  _navBusy=true;
-  var d=new Date(currentDate+'T12:00:00');
-  d.setDate(d.getDate()+delta);
-  currentDate=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-  var p=document.getElementById('datePicker');
-  p.setAttribute('value',currentDate);
-  p.defaultValue=currentDate;
-  p.value=currentDate;
-  updateDateDisplay();
-  render();
-  setTimeout(function(){_navBusy=false;},300);
-}
-function navToday(){
-  if(_navBusy)return;
-  _navBusy=true;
-  currentDate=todayStr();
-  var p=document.getElementById('datePicker');
-  p.value=currentDate;
-  updateDateDisplay();
-  render();
-  setTimeout(function(){_navBusy=false;},300);
-}
-function navPicker(v){
-  if(_navBusy)return;
-  if(v&&v.length===10){
-    currentDate=v;
-    updateDateDisplay();
-    render();
+
+// Mode-Indikator
+function applyModeIndicator() {
+  const now    = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const isNight = nowMin < sunriseMin || nowMin >= sunsetMin;
+  const sh = String(Math.floor(sunriseMin/60)).padStart(2,'0');
+  const sm = String(sunriseMin%60).padStart(2,'0');
+  const eh = String(Math.floor(sunsetMin/60)).padStart(2,'0');
+  const em = String(sunsetMin%60).padStart(2,'0');
+  const theme = localStorage.getItem('g-theme') || 'system';
+  if (theme === 'system') {
+    document.getElementById('mode-indicator').textContent =
+      isNight ? ('🌙 Auto · ☀ '+sh+':'+sm) : ('☀ Auto · 🌙 '+eh+':'+em);
+  } else {
+    document.getElementById('mode-indicator').textContent = theme === 'dark' ? '🌙 Dunkel' : '☀ Hell';
   }
 }
-function updateDateDisplay(){
-  document.getElementById('dateDisplay').textContent=dateDE(currentDate);
+
+// Countdown-Logik
+const DAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function pad(n){ return String(n).padStart(2,'0'); }
+function formatCountdown(ms){
+  if (ms <= 0) return '00:00:00';
+  var s = Math.floor(ms/1000);
+  return pad(Math.floor(s/3600))+':'+pad(Math.floor((s%3600)/60))+':'+pad(s%60);
 }
-
-/* ── Time utils ─────────────────────────────────────────────── */
-function toMin(t){if(!t)return null;var p=t.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
-function fromMin(m){if(m==null)return '';var h=Math.floor(m/60)%24;return pad(h)+':'+pad(m%60);}
-function hhmm(m){if(m==null||m<0)return '—';return Math.floor(m/60)+':'+pad(m%60);}
-
-/* ── 5-Minuten-Raster: Eingabe runden ───────────────────────── */
-function roundTo5(val){
-  // val = "HH:MM"
-  if(!val)return val;
-  var min=toMin(val);
-  var rounded=Math.round(min/5)*5;
-  return fromMin(rounded);
+function formatLong(ms){
+  if (ms <= 0) return '';
+  var s=Math.floor(ms/1000), d=Math.floor(s/86400), h=Math.floor((s%86400)/3600),
+      m=Math.floor((s%3600)/60), sc=s%60;
+  if (d > 0) return d+'T '+pad(h)+'h '+pad(m)+'m '+pad(sc)+'s';
+  if (h > 0) return pad(h)+'h '+pad(m)+'m '+pad(sc)+'s';
+  return pad(m)+'m '+pad(sc)+'s';
 }
+function getMin(t){ var p=t.split(':').map(Number); return p[0]*60+p[1]; }
 
-/* ── Pfeiltasten: 15-min-Schritte ──────────────────────────── */
-function timeKeydown(e,fieldId){
-  if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
-  e.preventDefault();
-  var el=document.getElementById(fieldId);
-  var val=el.value;
-  if(!val)return;
-  var min=toMin(val);
-  var step=e.key==='ArrowUp'?15:-15;
-  var newMin=min+step;
-  if(newMin<0)newMin=0;
-  if(newMin>=24*60)newMin=23*60+55;
-  el.value=fromMin(newMin);
-  if(fieldId==='inputBis'){
-    bisAuto=false;
-    el.classList.remove('auto-val');
-    document.getElementById('bisHint').textContent='Bis';
-  }
-  if(fieldId==='inputVon') onVonChange();
-}
+function tick() {
+  var now = new Date();
+  var day = now.getDay();
+  document.getElementById('live-time').textContent =
+    pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+  document.getElementById('weekday').textContent = DAYS[day];
+  applyModeIndicator();
 
-/* ── Von → Bis auto (+30 min) ──────────────────────────────── */
-function onVonChange(){
-  var von=document.getElementById('inputVon').value;
-  if(!von)return;
-  if(bisAuto){
-    document.getElementById('inputBis').value=fromMin(toMin(von)+15);
-    document.getElementById('inputBis').classList.add('auto-val');
-    document.getElementById('bisHint').textContent='+15 min';
-  }
-}
-function onBisManual(){
-  bisAuto=false;
-  document.getElementById('inputBis').classList.remove('auto-val');
-  document.getElementById('bisHint').textContent='Bis';
-}
+  var startStr = document.getElementById('input-start').value || '07:30';
+  var endStr   = document.getElementById('input-end').value   || '16:00';
+  var startMin = getMin(startStr), endMin = getMin(endStr);
+  var nowMin   = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
 
-/* ── Buchung hinzufügen ─────────────────────────────────────── */
-function addEntry(){
-  // Runde Von und Bis auf 5-Minuten-Raster
-  var von=roundTo5(document.getElementById('inputVon').value);
-  var bis=roundTo5(document.getElementById('inputBis').value);
-  var mandant=document.getElementById('inputMandant').value.trim();
-  var notiz=document.getElementById('inputNotiz').value.trim();
-
-  if(!von||!bis){toast('Bitte Von und Bis angeben.');return;}
-  if(toMin(bis)<=toMin(von)){toast('Bis muss nach Von liegen.');return;}
-  if(!mandant){toast('Bitte Mandanten angeben.');return;}
-
-  // Werte auf Raster korrigieren falls nötig
-  document.getElementById('inputVon').value=von;
-  document.getElementById('inputBis').value=bis;
-
-  var entries=getEntries();
-  entries.push({id:Date.now(),von:von,bis:bis,mandant:mandant,notiz:notiz});
-  entries.sort(function(a,b){return a.von.localeCompare(b.von);});
-  setEntries(entries);
-
-  // Nächste Buchung vorbereiten
-  document.getElementById('inputVon').value=bis;
-  bisAuto=true;
-  document.getElementById('inputBis').value=fromMin(toMin(bis)+15);
-  document.getElementById('inputBis').classList.add('auto-val');
-  document.getElementById('bisHint').textContent='+15 min';
-  document.getElementById('inputNotiz').value='';
-  document.getElementById('inputNotizSelect').value='';
-  document.getElementById('inputMandant').value='';
-  document.getElementById('inputMandant').focus();
-
-  render();
-  toast('Buchung gespeichert.');
-}
-
-/* ── Löschen ────────────────────────────────────────────────── */
-function deleteEntry(id){
-  setEntries(getEntries().filter(function(e){return e.id!==id;}));
-  render();
-}
-function clearDay(){
-  if(!confirm('Alle Buchungen für '+dateDE(currentDate)+' löschen?'))return;
-  setEntries([]);render();
-}
-
-/* ── Render ─────────────────────────────────────────────────── */
-function render(){
-  updateDateDisplay();
-  renderPills();
-
-  var entries=getEntries();
-  var tbody=document.getElementById('entriesBody');
-
-  if(!entries.length){
-    tbody.innerHTML='<tr class="empty-row"><td colspan="6">Noch keine Buchungen für diesen Tag.</td></tr>';
-    document.getElementById('entryCount').textContent='0 Einträge';
-    document.getElementById('dayTotal').textContent='0:00 h';
-    document.getElementById('summarySection').style.display='none';
+  // Wochenende: Banner zeigen, Cards verstecken — Uhr läuft weiter
+  if (day === 0 || day === 6) {
+    document.getElementById('weekend-banner').style.display = 'block';
+    document.getElementById('card-feierabend').style.display = 'none';
+    document.getElementById('card-weekend').style.display = 'none';
     return;
   }
+  document.getElementById('weekend-banner').style.display = 'none';
+  document.getElementById('card-feierabend').style.display = 'block';
+  document.getElementById('card-weekend').style.display = 'block';
 
-  var cnt=entries.length;
-  document.getElementById('entryCount').textContent=cnt+' Eintr'+(cnt===1?'ag':'äge');
+  var endOfDay   = new Date(now); endOfDay.setHours(Math.floor(endMin/60), endMin%60, 0, 0);
+  var startOfDay = new Date(now); startOfDay.setHours(Math.floor(startMin/60), startMin%60, 0, 0);
+  document.getElementById('label-start').textContent = startStr + ' Uhr';
+  document.getElementById('label-end').textContent   = endStr + ' Uhr';
 
-  var totalMin=0;
-  var rows='';
-  entries.forEach(function(e){
-    var dur=toMin(e.bis)-toMin(e.von);
-    totalMin+=dur;
-    rows+='<tr>'+
-      '<td class="td-time">'+e.von+'</td>'+
-      '<td class="td-time">'+e.bis+'</td>'+
-      '<td class="td-dur">'+hhmm(dur)+' h</td>'+
-      '<td>'+esc(e.mandant)+'</td>'+
-      '<td class="td-note">'+esc(e.notiz)+'</td>'+
-      '<td class="td-act">'+
-      '<button class="btn-icon edit" onclick="openEditModal('+e.id+')" title="Bearbeiten"><svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>'+
-      '<button class="btn-icon del" onclick="deleteEntry('+e.id+')" title="Löschen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
-      '</td>'+
-      '</tr>';
-  });
-  tbody.innerHTML=rows;
-  document.getElementById('dayTotal').textContent=hhmm(totalMin)+' h';
-
-  // Mandanten aggregieren
-  var map={};
-  entries.forEach(function(e){
-    var d=toMin(e.bis)-toMin(e.von);
-    if(!map[e.mandant])map[e.mandant]={min:0,count:0};
-    map[e.mandant].min+=d;map[e.mandant].count++;
-  });
-  var sorted=Object.keys(map).sort(function(a,b){return map[b].min-map[a].min;});
-
-  // Summary-Cards mit DATEV-Checkbox
-  var sc='';
-  sorted.forEach(function(name){
-    var key='datev_'+currentDate+'_'+name;
-    var checked=localStorage.getItem(key)==='1';
-    var cbId='cb-'+name.replace(/[^a-zA-Z0-9]/g,'_');
-    sc+='<label for="'+cbId+'" class="summary-card'+(checked?' checked':'')+'" style="cursor:pointer;display:block;">'+ 
-      '<div class="sc-name">'+esc(name)+'</div>'+
-      '<div class="sc-time">'+hhmm(map[name].min)+'<span class="sc-unit"> h</span></div>'+
-      '<div class="sc-count">'+map[name].count+' Buchung'+(map[name].count===1?'':'en')+'</div>'+
-      '<div class="sc-check'+(checked?' done':'')+'">'+
-        '<input type="checkbox" id="'+cbId+'" '+(checked?'checked':'')+' onchange="toggleDatev(\''+esc(name)+'\',this)"> In DATEV übernommen'+
-      '</div>'+
-      '</label>';
-  });
-  document.getElementById('summaryGrid').innerHTML=sc;
-  document.getElementById('summarySection').style.display='block';
-}
-
-var TAETIGKEITEN=[
-  'Div. Telefonate/Emails',
-  'Kanzleiverwaltung',
-  'EDV-Aufwand/PC-Probleme',
-  'Küchendienst',
-  'Interne Fortbildung',
-  'Hilfestellungen',
-  'Mdt.-Neuannahmen/Erstgespräche'
-];
-
-function renderPills(){
-  var mandants=allMandants();
-  document.getElementById('mandantList').innerHTML=mandants.map(function(m){return '<option value="'+esc(m)+'">';}).join('');
-  var cur=document.getElementById('inputMandant').value;
-  document.getElementById('pillBar').innerHTML=TAETIGKEITEN.map(function(t){
-    return '<button class="pill '+(t===cur?'active':'')+'" onclick="selectTaetigkeit(\''+esc(t)+'\')">'+esc(t)+'</button>';
-  }).join('');
-}
-
-function applyNotizSelect(val){
-  if(val) document.getElementById('inputNotiz').value=val;
-  document.getElementById('inputNotizSelect').value='';
-}
-function selectTaetigkeit(name){
-  document.getElementById('inputMandant').value=name;
-  renderPills();
-  document.getElementById('inputNotiz').focus();
-}
-
-/* ── XLSX Export ────────────────────────────────────────────── */
-function exportXLSX(){
-  var entries=getEntries();
-  if(!entries.length){toast('Keine Daten zum Exportieren.');return;}
-
-  var wsData=[['Datum','Von','Bis','Dauer','Mandant','Tätigkeit']];
-  entries.forEach(function(e){
-    var dur=hhmm(toMin(e.bis)-toMin(e.von));
-    wsData.push([currentDate,e.von,e.bis,dur,e.mandant,e.notiz||'']);
-  });
-
-  // Leerzeile + Summen pro Mandant
-  wsData.push([]);
-  wsData.push(['','','','','Mandant','Gesamt']);
-  var map={};
-  entries.forEach(function(e){
-    var d=toMin(e.bis)-toMin(e.von);
-    if(!map[e.mandant])map[e.mandant]=0;
-    map[e.mandant]+=d;
-  });
-  Object.keys(map).sort().forEach(function(name){
-    wsData.push(['','','','',name,hhmm(map[name])+' h']);
-  });
-  var total=entries.reduce(function(s,e){return s+toMin(e.bis)-toMin(e.von);},0);
-  wsData.push(['','','','','Gesamt',hhmm(total)+' h']);
-
-  var wb=XLSX.utils.book_new();
-  var ws=XLSX.utils.aoa_to_sheet(wsData);
-  ws['!cols']=[{wch:12},{wch:8},{wch:8},{wch:8},{wch:24},{wch:28}];
-  XLSX.utils.book_append_sheet(wb,ws,'Zeiterfassung');
-  XLSX.writeFile(wb,'Zeiterfassung_'+currentDate+'.xlsx');
-  toast('XLSX exportiert.');
-}
-
-/* ── XLSX Import ─────────────────────────────────────────────── */
-function importXLSX(input){
-  var file=input.files[0];
-  if(!file){return;}
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var wb=XLSX.read(e.target.result,{type:'array'});
-      var ws=wb.Sheets[wb.SheetNames[0]];
-      var rows=XLSX.utils.sheet_to_json(ws,{header:1});
-      // Überspringe Header-Zeile, lies bis zur ersten Leerzeile
-      var imported=0;
-      var entries=getEntries();
-      var existingIds=new Set(entries.map(function(x){return x.von+'_'+x.bis+'_'+x.mandant;}));
-      for(var i=1;i<rows.length;i++){
-        var r=rows[i];
-        if(!r||!r[0]||!r[1]||!r[2])continue; // Leerzeile oder Summenbereich
-        var datum=String(r[0]||'').trim();
-        var von=String(r[1]||'').trim();
-        var bis=String(r[2]||'').trim();
-        var mandant=String(r[4]||'').trim();
-        var notiz=String(r[5]||'').trim();
-        if(!datum||!von||!bis||!mandant)continue;
-        // Zeitformat sicherstellen HH:MM
-        if(!/^\d{1,2}:\d{2}$/.test(von)||!/^\d{1,2}:\d{2}$/.test(bis))continue;
-        var key=von+'_'+bis+'_'+mandant;
-        if(existingIds.has(key))continue; // Duplikat überspringen
-        if(!allData[datum])allData[datum]=[];
-        allData[datum].push({id:Date.now()+i,von:von,bis:bis,mandant:mandant,notiz:notiz});
-        existingIds.add(key);
-        imported++;
-      }
-      // Sortieren
-      Object.keys(allData).forEach(function(d){
-        allData[d].sort(function(a,b){return a.von.localeCompare(b.von);});
-      });
-      saveData();
-      render();
-      toast(imported+' Buchung'+(imported===1?'':'en')+' importiert.');
-    }catch(err){
-      toast('Fehler beim Import: '+err.message);
-    }
-    input.value=''; // Reset damit dieselbe Datei nochmal gewählt werden kann
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-/* ── DATEV-Checkbox ─────────────────────────────────────────── */
-function toggleDatev(name,cb){
-  var key='datev_'+currentDate+'_'+name;
-  localStorage.setItem(key,cb.checked?'1':'0');
-  render();
-}
-
-/* ── Edit Entry Modal ───────────────────────────────────────── */
-var editingId=null;
-function openEditModal(id){
-  var entries=getEntries();
-  var e=entries.find(function(x){return x.id===id;});
-  if(!e)return;
-  editingId=id;
-  document.getElementById('editVon').value=e.von;
-  document.getElementById('editBis').value=e.bis;
-  document.getElementById('editMandant').value=e.mandant;
-  document.getElementById('editNotiz').value=e.notiz||'';
-  document.getElementById('editModal').classList.add('show');
-}
-function closeEditModal(){
-  document.getElementById('editModal').classList.remove('show');
-  editingId=null;
-}
-function saveEdit(){
-  if(editingId===null)return;
-  var von=roundTo5(document.getElementById('editVon').value);
-  var bis=roundTo5(document.getElementById('editBis').value);
-  var mandant=document.getElementById('editMandant').value.trim();
-  var notiz=document.getElementById('editNotiz').value.trim();
-  if(!von||!bis){toast('Bitte Von und Bis angeben.');return;}
-  if(toMin(bis)<=toMin(von)){toast('Bis muss nach Von liegen.');return;}
-  if(!mandant){toast('Bitte Mandanten angeben.');return;}
-  var entries=getEntries();
-  var idx=entries.findIndex(function(x){return x.id===editingId;});
-  if(idx>=0){entries[idx]={id:editingId,von:von,bis:bis,mandant:mandant,notiz:notiz};}
-  entries.sort(function(a,b){return a.von.localeCompare(b.von);});
-  setEntries(entries);
-  closeEditModal();
-  render();
-  toast('Buchung gespeichert.');
-}
-
-function allMandants(){
-  var s={};
-  Object.values(allData).forEach(function(day){day.forEach(function(e){s[e.mandant]=1;});});
-  return Object.keys(s).sort();
-}
-
-function toast(msg){
-  var el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show');},2400);
-}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-
-/* ── Keyboard: Enter = buchen / speichern ───────────────────── */
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeEditModal();closeModal();}
-  if(e.key==='Enter'){
-    if(['inputNotiz','inputMandant'].indexOf(e.target.id)>=0) addEntry();
-    if(['editVon','editBis','editMandant','editNotiz'].indexOf(e.target.id)>=0) saveEdit();
+  if (nowMin < startMin) {
+    document.getElementById('feierabend-display').innerHTML =
+      '<span class="pulsing">'+formatCountdown(startOfDay - now)+'</span>';
+    document.getElementById('feierabend-sub').textContent = '← Arbeit beginnt in...';
+    document.getElementById('progress-feierabend').style.width = '0%';
+  } else if (nowMin >= endMin) {
+    document.getElementById('feierabend-display').innerHTML =
+      '<span class="done-msg">Feierabend! 🎉</span>';
+    document.getElementById('feierabend-sub').textContent = 'Du hast es verdient.';
+    document.getElementById('progress-feierabend').style.width = '100%';
+  } else {
+    var pct = Math.min(100, ((now - startOfDay) / ((endMin - startMin)*60000)) * 100);
+    document.getElementById('feierabend-display').textContent = formatCountdown(endOfDay - now);
+    document.getElementById('feierabend-sub').textContent =
+      'Feierabend um '+endStr+' Uhr — '+Math.round(pct)+'% des Tages rum';
+    document.getElementById('progress-feierabend').style.width = pct+'%';
   }
-});
 
-/* ── Init ───────────────────────────────────────────────────── */
-window.addEventListener('load',function(){
-  var now=new Date();
-  var m=Math.round(now.getMinutes()/15)*15;
-  var h=now.getHours()+(m>=60?1:0);m=m%60;
-  var vonStr=pad(h%24)+':'+pad(m);
-  document.getElementById('inputVon').value=vonStr;
-  document.getElementById('inputBis').value=fromMin(toMin(vonStr)+15);
-  document.getElementById('inputBis').classList.add('auto-val');
-  bisAuto=true;
-  document.getElementById('datePicker').value=currentDate;
-  render();
-});
+  var daysUntilFri = (5 - day + 7) % 7 || (nowMin >= endMin ? 7 : 0);
+  var nextFri = new Date(now);
+  nextFri.setDate(now.getDate() + daysUntilFri);
+  nextFri.setHours(Math.floor(endMin/60), endMin%60, 0, 0);
+  var lastMon = new Date(now);
+  lastMon.setDate(now.getDate() - ((day - 1 + 7) % 7));
+  lastMon.setHours(0, 0, 0, 0);
+  var weekPct = Math.min(100, ((now - lastMon) / (nextFri - lastMon)) * 100);
+
+  if (day === 5 && nowMin >= endMin) {
+    document.getElementById('weekend-display').innerHTML = '<span class="done-msg">Wochenende! 🎉</span>';
+    document.getElementById('weekend-sub').textContent = 'Schönes Wochenende!';
+    document.getElementById('progress-weekend').style.width = '100%';
+  } else {
+    document.getElementById('weekend-display').textContent = formatLong(nextFri - now);
+    var friName = daysUntilFri === 0 ? 'heute' : ('in '+daysUntilFri+' Tag'+(daysUntilFri > 1 ? 'en' : ''));
+    document.getElementById('weekend-sub').textContent =
+      'Freitag '+friName+' um '+endStr+' Uhr — Woche '+Math.round(weekPct)+'% vorbei';
+    document.getElementById('progress-weekend').style.width = weekPct+'%';
+  }
+}
+
+// Tick sofort starten — Sonnenwerte laden im Hintergrund nach
+tick();
+setInterval(tick, 1000);
+fetchSunTimes();
+setInterval(fetchSunTimes, 60*60*1000);
 </script>
 </body>
 </html>
