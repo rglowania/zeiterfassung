@@ -160,6 +160,12 @@ footer{
   letter-spacing:1px;color:var(--text-muted);opacity:0.6;
 }
 @media(max-width:680px){.card,.accent-card{padding:18px 16px;}}
+.form-grid{display:grid;grid-template-columns:72px 72px 1fr 1fr;gap:12px;align-items:start;}
+@media(max-width:680px){
+  .form-grid{grid-template-columns:1fr 1fr;}
+  .form-grid .col-mandant,.form-grid .col-taet{grid-column:span 2;}
+  .form-grid .col-taet .select-input-wrap{flex-direction:row;}
+}
 
 /* ═══════════════════════════════════════════════════════════════
    APP-SPEZIFISCH
@@ -194,13 +200,6 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
 .sc-check{display:flex;align-items:center;gap:6px;margin-top:10px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-muted);user-select:none;}
 .sc-check input{accent-color:var(--accent);width:12px;height:12px;cursor:pointer;}
 .sc-check.done{color:var(--accent-lt);}
-
-/* Mandanten-Verwaltung */
-.mandant-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
-.mandant-row:last-child{border-bottom:none;}
-.mandant-row .mr-name{flex:1;font-family:'IBM Plex Mono',monospace;font-size:12px;}
-.mandant-row input[type="text"]{flex:1;font-size:11px;padding:4px 7px;}
-.mandant-row .btn-icon{flex-shrink:0;}
 
 /* Pill bar */
 .pill-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;}
@@ -296,22 +295,12 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
 </div>
 
 <!-- Mandanten-Verwaltung Modal -->
-<div class="modal-overlay" id="mandantModal">
-  <div class="modal">
-    <div class="modal-title">Mandanten verwalten</div>
-    <div id="mandantMgmtList" style="margin-bottom:20px;max-height:340px;overflow-y:auto;"></div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeMandantModal()">Schließen</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="reloadModal">
   <div class="modal">
     <div class="modal-title">⚠ Seite neu laden?</div>
     <div class="modal-body">
       <b>Achtung:</b> Beim Neu­laden der Seite gehen alle nicht gespeicherten Buchungen unwiderruflich verloren.<br><br>
-      Bitte exportiere deine Daten vor dem Neu­laden als <b>XLSX</b> oder <b>PDF</b>.
+      Bitte exportiere deine Daten vor dem Neu­laden als <b>XLSX</b>.
     </div>
     <div class="modal-actions">
       <button class="btn btn-danger" onclick="confirmReload()">Trotzdem neu laden</button>
@@ -349,7 +338,7 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
   <!-- Eingabe -->
   <div class="card">
     <div class="card-title">Neue Buchung</div>
-    <div style="display:grid;grid-template-columns:72px 72px 1fr 1fr;gap:12px;align-items:end;">
+    <div class="form-grid">
       <div>
         <input type="time" id="inputVon" step="300" oninput="onVonChange()" onkeydown="timeKeydown(event,'inputVon')">
         <div class="hint">Von</div>
@@ -358,13 +347,13 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
         <input type="time" id="inputBis" step="300" class="auto-val" oninput="onBisManual()" onkeydown="timeKeydown(event,'inputBis')">
         <div class="hint"><b id="bisHint">+15 min</b></div>
       </div>
-      <div>
+      <div class="col-mandant">
         <input type="text" id="inputMandant" placeholder="M. Mustermann" list="mandantList" autocomplete="off">
         <div class="hint">Mandant (oder Verwaltungsauftrag)</div>
         <datalist id="mandantList"></datalist>
       </div>
-      <div>
-        <div style="display:flex;gap:6px;">
+      <div class="col-taet">
+        <div class="select-input-wrap" style="display:flex;gap:6px;">
           <select id="inputNotizSelect" onchange="applyNotizSelect(this.value)" style="flex:0 0 auto;width:auto;max-width:120px;">
             <option value="">– Auswahl –</option>
             <option value="ESt">ESt</option>
@@ -372,7 +361,7 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
             <option value="EÜR">EÜR</option>
             <option value="JA">JA</option>
           </select>
-          <input type="text" id="inputNotiz" placeholder="Freie Eingabe (optional)" style="flex:1;">
+          <input type="text" id="inputNotiz" placeholder="Freie Eingabe (optional)" style="flex:1;min-width:0;">
         </div>
         <div class="hint">Tätigkeit / Notiz</div>
       </div>
@@ -429,8 +418,7 @@ input[type="time"].auto-val{border-color:var(--accent);color:var(--accent-lt);}
 </div>
 
 <footer>
-  <div style="margin-bottom:6px;opacity:1;font-size:9px;max-width:720px;margin-left:auto;margin-right:auto;line-height:1.6;">Alle Berechnungen sind Näherungswerte auf Basis der jeweils angegebenen Rechtsgrundlagen. Individuelle Faktoren bleiben unberücksichtigt. Kein Ersatz für individuelle Steuer- oder Rechtsberatung &middot; Alle Angaben ohne Gewähr</div>
-  &copy; Robin Glowania &middot; Zuletzt aktualisiert: 12.05.2026
+  &copy; Robin Glowania &middot; Zuletzt aktualisiert: 19.05.2026
 </footer>
 <div class="g-toast" id="toast"></div>
 
@@ -621,13 +609,7 @@ function clearDay(){
   setEntries([]);render();
 }
 
-/* ── Mandant-Pills ──────────────────────────────────────────── */
-function selectMandant(name){
-  document.getElementById('inputMandant').value=name;
-  renderPills();
-  document.getElementById('inputNotiz').focus();
-}
-
+/* ── Render ─────────────────────────────────────────────────── */
 function render(){
   updateDateDisplay();
   renderPills();
@@ -847,76 +829,11 @@ function saveEdit(){
   toast('Buchung gespeichert.');
 }
 
-/* ── Mandanten-Verwaltung ───────────────────────────────────── */
-// Eigene Mandantenliste (ergänzend zu den aus Buchungen abgeleiteten)
-function getCustomMandants(){
-  try{return JSON.parse(localStorage.getItem('g_mandants')||'[]');}catch(e){return[];}
-}
-function saveCustomMandants(list){localStorage.setItem('g_mandants',JSON.stringify(list));}
-
 function allMandants(){
   var s={};
   Object.values(allData).forEach(function(day){day.forEach(function(e){s[e.mandant]=1;});});
-  getCustomMandants().forEach(function(m){s[m]=1;});
   return Object.keys(s).sort();
 }
-
-function openMandantModal(){
-  renderMandantMgmt();
-  document.getElementById('mandantModal').classList.add('show');
-}
-function closeMandantModal(){
-  document.getElementById('mandantModal').classList.remove('show');
-  renderPills();
-}
-function renderMandantMgmt(){
-  var mandants=allMandants();
-  var html='';
-  if(!mandants.length){
-    html='<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:var(--text-muted);padding:12px 0;">Keine Mandanten vorhanden.</div>';
-  }
-  mandants.forEach(function(m,i){
-    html+='<div class="mandant-row" id="mr-'+i+'">'+
-      '<span class="mr-name">'+esc(m)+'</span>'+
-      '<button class="btn-icon edit" onclick="startEditMandant('+i+',\''+esc(m)+'\')" title="Umbenennen"><svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>'+
-      '<button class="btn-icon del" onclick="deleteMandant(\''+esc(m)+'\')" title="Löschen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
-      '</div>';
-  });
-  document.getElementById('mandantMgmtList').innerHTML=html;
-}
-function startEditMandant(i,oldName){
-  var row=document.getElementById('mr-'+i);
-  row.innerHTML=
-    '<input type="text" value="'+esc(oldName)+'" id="me-'+i+'" style="flex:1;font-size:11px;padding:4px 7px;">'+
-    '<button class="btn-icon edit" onclick="saveMandantEdit('+i+',\''+esc(oldName)+'\')" title="Speichern"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>'+
-    '<button class="btn-icon del" onclick="renderMandantMgmt()" title="Abbrechen"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
-  document.getElementById('me-'+i).focus();
-}
-function saveMandantEdit(i,oldName){
-  var newName=(document.getElementById('me-'+i).value||'').trim();
-  if(!newName){toast('Name darf nicht leer sein.');return;}
-  // In allen Buchungen umbenennen
-  Object.keys(allData).forEach(function(d){
-    allData[d].forEach(function(e){if(e.mandant===oldName)e.mandant=newName;});
-  });
-  saveData();
-  // Custom-Liste aktualisieren
-  var cl=getCustomMandants();
-  var ci=cl.indexOf(oldName);
-  if(ci>=0)cl[ci]=newName; else cl.push(newName);
-  saveCustomMandants(cl);
-  renderMandantMgmt();
-  toast('Umbenannt.');
-}
-function deleteMandant(name){
-  if(!confirm('"'+name+'" aus der Liste entfernen?\n(Buchungen bleiben erhalten)'))return;
-  var cl=getCustomMandants().filter(function(m){return m!==name;});
-  saveCustomMandants(cl);
-  // Aus allData-Buchungen NICHT löschen, nur Custom-Liste
-  renderMandantMgmt();
-  toast('Mandant entfernt.');
-}
-
 
 function toast(msg){
   var el=document.getElementById('toast');
@@ -927,7 +844,7 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace
 
 /* ── Keyboard: Enter = buchen / speichern ───────────────────── */
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeEditModal();closeMandantModal();closeModal();}
+  if(e.key==='Escape'){closeEditModal();closeModal();}
   if(e.key==='Enter'){
     if(['inputNotiz','inputMandant'].indexOf(e.target.id)>=0) addEntry();
     if(['editVon','editBis','editMandant','editNotiz'].indexOf(e.target.id)>=0) saveEdit();
